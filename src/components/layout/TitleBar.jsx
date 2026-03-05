@@ -19,6 +19,10 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
 
   async function handleDelete(ch,e){
     e.stopPropagation();
+    if(ch.locked){
+      alert('This channel is locked. Unlock it in Channel Settings before deleting.');
+      return;
+    }
     if(confirm===ch.id){
       try{
         await window.forge.deleteChannel(ch.id);
@@ -77,18 +81,28 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
                 </div>
                 {activeChannel?.id===ch.id&&<span style={{fontSize:10,color:accent,flexShrink:0}}>✓</span>}
               </div>
-              {/* Delete */}
-              <button onClick={e=>handleDelete(ch,e)} style={{
-                flexShrink:0,padding:'3px 8px',borderRadius:6,fontSize:10,fontWeight:700,cursor:'pointer',
-                background:confirm===ch.id?'rgba(238,34,68,0.15)':'transparent',
-                border:'1px solid '+(confirm===ch.id?'rgba(238,34,68,0.5)':'rgba(255,255,255,0.08)'),
-                color:confirm===ch.id?'#EE2244':muted,
-                transition:'all 0.15s',
-              }}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(238,34,68,0.5)';e.currentTarget.style.color='#EE2244';}}
-                onMouseLeave={e=>{if(confirm!==ch.id){e.currentTarget.style.borderColor='rgba(255,255,255,0.08)';e.currentTarget.style.color=muted;}}}>
-                {confirm===ch.id?'Sure?':'✕'}
-              </button>
+              {/* Lock / Delete */}
+              <div style={{display:'flex',gap:4,flexShrink:0}}>
+                <button onClick={async e=>{e.stopPropagation();try{await window.forge.updateChannel(ch.id,{locked:ch.locked?0:1});await loadChannels();}catch(err){console.error(err);}}}
+                  title={ch.locked?'Unlock channel':'Lock channel'}
+                  style={{flexShrink:0,padding:'3px 7px',borderRadius:6,fontSize:11,cursor:'pointer',
+                    background:ch.locked?'rgba(255,170,0,0.12)':'transparent',
+                    border:'1px solid '+(ch.locked?'rgba(255,170,0,0.3)':'rgba(255,255,255,0.08)'),
+                    color:ch.locked?'#FFAA00':muted,transition:'all 0.15s'}}>
+                  {ch.locked?'🔒':'🔓'}
+                </button>
+                <button onClick={e=>handleDelete(ch,e)} style={{
+                  flexShrink:0,padding:'3px 8px',borderRadius:6,fontSize:10,fontWeight:700,cursor:'pointer',
+                  background:confirm===ch.id?'rgba(238,34,68,0.15)':'transparent',
+                  border:'1px solid '+(confirm===ch.id?'rgba(238,34,68,0.5)':'rgba(255,255,255,0.08)'),
+                  color:confirm===ch.id?'#EE2244':ch.locked?'rgba(255,255,255,0.15)':muted,
+                  transition:'all 0.15s',opacity:ch.locked?0.4:1,
+                }}
+                  onMouseEnter={e=>{if(!ch.locked){e.currentTarget.style.borderColor='rgba(238,34,68,0.5)';e.currentTarget.style.color='#EE2244';}}}
+                  onMouseLeave={e=>{if(confirm!==ch.id){e.currentTarget.style.borderColor='rgba(255,255,255,0.08)';e.currentTarget.style.color=ch.locked?'rgba(255,255,255,0.15)':muted;}}}>
+                  {confirm===ch.id?'Sure?':'✕'}
+                </button>
+              </div>
             </div>
           ))}
           <div style={{borderTop:'1px solid '+menuBorder,padding:'8px 14px'}}>

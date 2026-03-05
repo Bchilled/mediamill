@@ -33,6 +33,8 @@ function runMigrations(){
     ['channels','topic','TEXT DEFAULT ""'],
     ['channels','logo_path','TEXT DEFAULT NULL'],
     ['channels','branding','TEXT DEFAULT NULL'],
+    ['channels','formats','TEXT DEFAULT \'["long"]\''],
+    ['channels','locked','INTEGER DEFAULT 0'],
     ['ideas','origin',"TEXT DEFAULT 'manual'"],
     ['ideas','ai_summary','TEXT DEFAULT NULL'],
     ['videos','idea_id','TEXT DEFAULT NULL'],
