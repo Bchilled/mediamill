@@ -1,5 +1,5 @@
 {
-  "name": "forge-video-factory",
+  "name": "mediamill",
   "version": "0.1.0",
   "main": "electron/main.js",
   "scripts": {
@@ -66,5 +66,7 @@
       "owner": "Bchilled",
       "repo": "mediamill"
     }
-  }
+  },
+  "productName": "MediaMill",
+  "description": "Canadian content video factory"
 }

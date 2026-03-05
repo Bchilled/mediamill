@@ -115,3 +115,5 @@ module.exports=(ipcMain)=>{
       return{ok:false,error:'Unknown service'};
     }catch(e){return{ok:false,error:e.message};}
   });
+
+};
