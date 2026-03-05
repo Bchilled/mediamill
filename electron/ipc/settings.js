@@ -58,10 +58,8 @@ module.exports=(ipcMain)=>{
     await getDb();
     const rows=all('SELECT key,value FROM settings');
     return flattenSettings(rows);
-  };
-};
+  });
 
-  // Open URL in system browser (prevents Electron popup windows)
   // Test an API key is valid
   ipcMain.handle('settings:testKey',async(_,service,key)=>{
     const https=require('https');
@@ -119,8 +117,6 @@ module.exports=(ipcMain)=>{
       return{ok:false,error:'Unknown service'};
     }catch(e){return{ok:false,error:e.message};}
   });
-
-};
 
   ipcMain.handle('system:status',async()=>{
     const{getDb,get,all}=require('./db');
@@ -248,3 +244,4 @@ module.exports=(ipcMain)=>{
     if(!canceled&&filePath){fs.writeFileSync(filePath,text,'utf8');return{ok:true};}
     return{ok:false};
   });
+};

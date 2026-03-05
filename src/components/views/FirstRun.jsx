@@ -397,7 +397,7 @@ export default function FirstRun({onComplete}){
           )}
         </Screen>
       )];
-    }))
+    })),
     media_intro:()=>(
       <Screen isDark={isDark} title="Media Sources" subtitle="These provide video clips for your videos. All optional — free sources are always used."
         back={()=>go('need_ai')}
