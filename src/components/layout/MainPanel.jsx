@@ -4,6 +4,7 @@ import TabBar from './TabBar';
 import Dashboard from '../views/Dashboard';
 import NewChannel from '../views/NewChannel';
 import Settings from '../views/Settings';
+import IdeaBoard from '../views/IdeaBoard';
 
 const makeStub=(name,icon)=>function(){
   const{theme}=useApp();
@@ -20,7 +21,6 @@ const makeStub=(name,icon)=>function(){
 };
 
 const Pipeline=makeStub('Pipeline','🎬');
-const IdeaBoard=makeStub('Idea Board','💡');
 const PromptLibrary=makeStub('Prompts','📝');
 const AgentManager=makeStub('Agents','🤖');
 const TaskManager=makeStub('Tasks','📋');

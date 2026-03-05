@@ -1,30 +1,40 @@
 const{contextBridge,ipcRenderer}=require('electron');
 contextBridge.exposeInMainWorld('forge',{
+  // Window
   minimize:()=>ipcRenderer.invoke('window:minimize'),
   maximize:()=>ipcRenderer.invoke('window:maximize'),
   close:()=>ipcRenderer.invoke('window:close'),
+  // Channels
   getChannels:()=>ipcRenderer.invoke('channels:getAll'),
   createChannel:(d)=>ipcRenderer.invoke('channels:create',d),
   updateChannel:(id,d)=>ipcRenderer.invoke('channels:update',id,d),
   deleteChannel:(id)=>ipcRenderer.invoke('channels:delete',id),
-  getVideos:(cid,f)=>ipcRenderer.invoke('videos:getAll',cid,f),
+  // Videos
+  getVideos:(channelId,f)=>ipcRenderer.invoke('videos:getAll',channelId,f),
+  getVideo:(id)=>ipcRenderer.invoke('videos:get',id),
   createVideo:(d)=>ipcRenderer.invoke('videos:create',d),
   updateVideo:(id,d)=>ipcRenderer.invoke('videos:update',id,d),
   deleteVideo:(id)=>ipcRenderer.invoke('videos:delete',id),
   approveVideo:(id)=>ipcRenderer.invoke('videos:approve',id),
   startPipeline:(id)=>ipcRenderer.invoke('pipeline:start',id),
-  getIdeas:(cid)=>ipcRenderer.invoke('ideas:getAll',cid),
+  pipelineStatus:(id)=>ipcRenderer.invoke('pipeline:status',id),
+  // Ideas
+  getIdeas:(channelId,f)=>ipcRenderer.invoke('ideas:getAll',channelId,f),
   createIdea:(d)=>ipcRenderer.invoke('ideas:create',d),
   updateIdea:(id,d)=>ipcRenderer.invoke('ideas:update',id,d),
-  sendToPipeline:(id)=>ipcRenderer.invoke('ideas:toPipeline',id),
+  deleteIdea:(id)=>ipcRenderer.invoke('ideas:delete',id),
+  approveIdea:(id)=>ipcRenderer.invoke('ideas:approve',id),
+  rejectIdea:(id)=>ipcRenderer.invoke('ideas:reject',id),
+  scanIdeas:(channelId)=>ipcRenderer.invoke('ideas:scan',channelId),
+  // Agents
   getAgentConfig:()=>ipcRenderer.invoke('agents:getConfig'),
   updateAgentConfig:(c)=>ipcRenderer.invoke('agents:updateConfig',c),
+  // Tasks
   getTasks:(f)=>ipcRenderer.invoke('tasks:getAll',f),
   cancelTask:(id)=>ipcRenderer.invoke('tasks:cancel',id),
   retryTask:(id)=>ipcRenderer.invoke('tasks:retry',id),
+  // Settings
   getSettings:()=>ipcRenderer.invoke('settings:get'),
   updateSettings:(d)=>ipcRenderer.invoke('settings:update',d),
-  getSystemStats:()=>ipcRenderer.invoke('system:stats'),
-  on:(ch,cb)=>ipcRenderer.on(ch,(_,...a)=>cb(...a)),
-  off:(ch,cb)=>ipcRenderer.removeListener(ch,cb),
+  getSystemStats:()=>ipcRenderer.invoke('settings:systemStats'),
 });

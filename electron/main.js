@@ -5,16 +5,9 @@ let win;
 function createWindow(){
   win=new BrowserWindow({
     width:1440,height:900,minWidth:1100,minHeight:700,
-    frame:false,
-    transparent:true,
-    backgroundColor:'#00000000',
-    roundedCorners:true,
-    titleBarStyle:'hidden',
-    webPreferences:{
-      preload:path.join(__dirname,'preload.js'),
-      nodeIntegration:false,
-      contextIsolation:true,
-    },
+    frame:false,transparent:true,backgroundColor:'#00000000',
+    roundedCorners:true,titleBarStyle:'hidden',
+    webPreferences:{preload:path.join(__dirname,'preload.js'),nodeIntegration:false,contextIsolation:true},
     show:false,
   });
   isDev?win.loadURL('http://localhost:5173'):win.loadFile(path.join(__dirname,'../dist/index.html'));
@@ -29,5 +22,6 @@ app.whenReady().then(()=>{
   require('./ipc/agents')(ipcMain);
   require('./ipc/scheduler')(ipcMain);
   require('./ipc/settings')(ipcMain);
+  require('./ipc/ideas')(ipcMain);
 });
 app.on('window-all-closed',()=>app.quit());
