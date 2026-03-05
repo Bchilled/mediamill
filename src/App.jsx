@@ -1,102 +1,95 @@
-import React,{useState}from 'react';
-import TitleBar from './components/layout/TitleBar';
-import MainPanel from './components/layout/MainPanel';
-import TabBar from './components/layout/TabBar';
-import StatusBar from './components/layout/StatusBar';
-import SystemSetup from './components/views/SystemSetup';
-import ChannelWizard from './components/views/ChannelWizard';
-import ErrorBoundary from './components/shared/ErrorBoundary';
-import{AppProvider,useApp}from './context/AppContext';
-import{fix,FIX}from './utils/fixRouter';
-import SystemDoctor from './components/views/SystemDoctor';
+import React, { useState, useEffect } from 'react';
+import { AppProvider, useApp } from './context/AppContext';
 import ToastContainer from './components/shared/ToastContainer';
+import SolarSystem from './solar/SolarSystem';
+import Onboarding from './solar/Onboarding';
 
-function SetupGate({onDone}){
-  // Full-screen first-run experience
-  return(
+// Minimal top chrome — barely there
+function TopChrome() {
+  return (
     <div style={{
-      display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-      height:'100vh',background:'#0C0C10',color:'#ECECEC',textAlign:'center',padding:40,
+      position: 'fixed', top: 0, left: 0, right: 0, height: 40,
+      display: 'flex', alignItems: 'center', padding: '0 14px',
+      WebkitAppRegion: 'drag', zIndex: 500,
+      background: 'transparent',
     }}>
-      <div style={{fontSize:48,marginBottom:16}}>🎬</div>
-      <div style={{fontSize:28,fontWeight:800,marginBottom:8,color:'#ECECEC',letterSpacing:'-0.02em'}}>
-        Welcome to MediaMill
+      <div style={{
+        fontFamily: 'Syne, sans-serif', fontSize: 11, fontWeight: 800,
+        letterSpacing: '0.2em', textTransform: 'uppercase',
+        color: 'rgba(238,238,255,0.3)', WebkitAppRegion: 'no-drag',
+      }}>
+        Media<span style={{ color: '#7C6EFA' }}>Mill</span>
       </div>
-      <div style={{fontSize:14,color:'#777',marginBottom:40,maxWidth:360,lineHeight:1.7}}>
-        Your AI-powered video content factory.<br/>
-        Connect an AI model to get started.
-      </div>
-      <button onClick={onDone} style={{
-        padding:'14px 32px',borderRadius:10,fontSize:14,fontWeight:700,
-        background:'#6C63FF',color:'#fff',border:'none',cursor:'pointer',
-        boxShadow:'0 4px 24px rgba(108,99,255,0.45)',transition:'all 0.15s'}}
-        onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 8px 32px rgba(108,99,255,0.6)';}}
-        onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 4px 24px rgba(108,99,255,0.45)';}}>
-        Connect AI → Get Started
-      </button>
-      <div style={{marginTop:16,fontSize:11,color:'#555'}}>
-        Claude or Gemini — takes 30 seconds
+      <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, WebkitAppRegion: 'no-drag' }}>
+        {['—', '□', '✕'].map((c, i) => (
+          <button key={i} style={{
+            width: 26, height: 26, borderRadius: '50%',
+            background: 'transparent', border: 'none',
+            color: 'rgba(238,238,255,0.2)', fontSize: 11,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.12s',
+          }}
+            onMouseOver={e => e.currentTarget.style.background = i === 2 ? '#FF4757' : 'rgba(255,255,255,0.08)'}
+            onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+          >{c}</button>
+        ))}
       </div>
     </div>
   );
 }
 
-function Inner(){
-  const{theme,channels,settings,modal,setModal,activeView,setActiveView}=useApp();
-  const isDark=theme==='dark';
-  const hasKeys=settings?.apiKeys&&Object.values(settings.apiKeys).some(v=>v);
-  const loading=channels===null;
+function Inner() {
+  const { channels, settings, setSettings } = useApp();
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  const [zoomedChannel, setZoomedChannel] = useState(null);
 
-  if(loading)return(
-    <div style={{display:'flex',height:'100vh',alignItems:'center',justifyContent:'center',
-      background:'#0C0C10',color:'#555',fontSize:13,gap:8}}>
-      <span style={{animation:'spin 1s linear infinite',display:'inline-block'}}>⟳</span>
-      Loading…
-    </div>
-  );
+  const hasKeys = settings?.apiKeys && Object.values(settings.apiKeys).some(v => v);
+  const loading = channels === null;
 
-  // First-run: no AI keys yet → full-screen setup gate
-  // But if user navigated to settings already, let them through
-  if(!hasKeys&&activeView!=='settings')return(
-    <SetupGate onDone={()=>setActiveView('settings')}/>
-  );
+  // Build sun objects from connected AI providers
+  const suns = Object.entries(settings?.apiKeys || {})
+    .filter(([, v]) => v)
+    .map(([provider]) => ({ id: provider, provider }));
 
-  const bg=isDark?'#0C0C0E':'#F0F0F5';
+  const showOnboarding = !onboardingDone && (!hasKeys || !channels?.length);
 
-  return(
+  if (loading) return (
     <div style={{
-      display:'flex',flexDirection:'column',height:'100vh',overflow:'hidden',
-      background:bg,color:isDark?'#ECECEC':'#111',
-      borderRadius:14,
-      boxShadow:isDark
-        ?'0 0 0 1px rgba(255,255,255,0.06),0 32px 80px rgba(0,0,0,0.9)'
-        :'0 0 0 1px rgba(0,0,0,0.06),0 24px 60px rgba(0,0,0,0.15)',
+      position: 'fixed', inset: 0, background: '#03020A',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'rgba(238,238,255,0.3)', fontSize: 13,
+      fontFamily: 'DM Sans, sans-serif',
     }}>
-      <TitleBar onNewChannel={()=>fix(FIX.NEW_CHANNEL)}/>
-      <TabBar/>
-      <ErrorBoundary name="MainPanel" isDark={isDark}>
-        <MainPanel/>
-      </ErrorBoundary>
-      <StatusBar/>
-
-      {modal?.type==='system'&&(
-        <SystemSetup initialTab={modal.payload?.tab} initialSubTab={modal.payload?.subTab} onClose={()=>setModal(null)}/>
-      )}
-      {modal?.type==='channel'&&(
-        <ChannelWizard payload={modal.payload} onClose={()=>setModal(null)} onCreated={()=>setModal(null)}/>
-      )}
-      {modal?.type==='doctor'&&(
-        <SystemDoctor section={modal.payload?.section} onClose={()=>setModal(null)}/>
-      )}
+      <div style={{ animation: 'spin 1.2s linear infinite', display: 'inline-block', marginRight: 10 }}>◌</div>
+      Waking up…
     </div>
+  );
+
+  return (
+    <>
+      {/* 3D Solar System — always full screen */}
+      <SolarSystem
+        suns={suns.length ? suns : [{ id: 'placeholder', provider: 'claude' }]}
+        channels={channels || []}
+        onSelectChannel={setZoomedChannel}
+      />
+
+      {/* Minimal chrome on top */}
+      <TopChrome />
+
+      {/* Onboarding floats over the solar system */}
+      {showOnboarding && (
+        <Onboarding onComplete={() => setOnboardingDone(true)} />
+      )}
+    </>
   );
 }
 
-export default function App(){
-  return(
+export default function App() {
+  return (
     <AppProvider>
-      <Inner/>
-      <ToastContainer/>
+      <Inner />
+      <ToastContainer />
     </AppProvider>
   );
 }
