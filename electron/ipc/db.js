@@ -92,4 +92,7 @@ function all(sql,params=[]){
 }
 function get(sql,params=[]){return all(sql,params)[0]||null;}
 
-module.exports={getDb,saveDb,run,all,get};
+// Works as require('./ipc/db')(ipcMain) from main.js AND const{getDb}=require('./ipc/db')
+const dbModule=function(ipcMain){};
+dbModule.getDb=getDb;dbModule.saveDb=saveDb;dbModule.run=run;dbModule.all=all;dbModule.get=get;
+module.exports=dbModule;

@@ -2,6 +2,7 @@ const{app,BrowserWindow,ipcMain}=require('electron');
 const path=require('path');
 const isDev=!app.isPackaged;
 let win;
+
 function createWindow(){
   win=new BrowserWindow({
     width:1440,height:900,minWidth:1100,minHeight:700,
@@ -13,7 +14,11 @@ function createWindow(){
   isDev?win.loadURL('http://localhost:5173'):win.loadFile(path.join(__dirname,'../dist/index.html'));
   win.once('ready-to-show',()=>win.show());
 }
-app.whenReady().then(()=>{
+
+app.whenReady().then(async()=>{
+  // Run startup recovery before window opens
+  await require('./startup')();
+
   createWindow();
   require('./ipc/window')(ipcMain,win);
   require('./ipc/db')(ipcMain);
@@ -24,4 +29,5 @@ app.whenReady().then(()=>{
   require('./ipc/settings')(ipcMain);
   require('./ipc/ideas')(ipcMain);
 });
+
 app.on('window-all-closed',()=>app.quit());
