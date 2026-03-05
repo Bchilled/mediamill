@@ -26,18 +26,11 @@ function checkForUpdates(){
   try{
     const{autoUpdater}=require('electron-updater');
     autoUpdater.checkForUpdatesAndNotify();
-    autoUpdater.on('update-available',()=>{
-      win?.webContents.send('update-available');
-    });
-    autoUpdater.on('update-downloaded',()=>{
-      win?.webContents.send('update-downloaded');
-    });
-  }catch(e){
-    console.log('[Updater] Not available in dev mode');
-  }
+    autoUpdater.on('update-available',()=>win?.webContents.send('update-available'));
+    autoUpdater.on('update-downloaded',()=>win?.webContents.send('update-downloaded'));
+  }catch(e){console.log('[Updater] Not available in dev mode');}
 }
 
-// Extract bundled FFmpeg to userData on first run
 async function ensureFFmpeg(){
   if(isDev)return;
   try{
@@ -45,12 +38,8 @@ async function ensureFFmpeg(){
     const ffmpegDest=path.join(app.getPath('userData'),'ffmpeg.exe');
     if(!fs.existsSync(ffmpegDest)){
       const bundled=path.join(process.resourcesPath,'ffmpeg.exe');
-      if(fs.existsSync(bundled)){
-        fs.copyFileSync(bundled,ffmpegDest);
-        console.log('[FFmpeg] Extracted to',ffmpegDest);
-      }
+      if(fs.existsSync(bundled)){fs.copyFileSync(bundled,ffmpegDest);console.log('[FFmpeg] Extracted');}
     }
-    // Set env so worker can find it
     process.env.MEDIAMILL_FFMPEG=ffmpegDest;
   }catch(e){console.error('[FFmpeg] Extract failed',e.message);}
 }
@@ -58,12 +47,16 @@ async function ensureFFmpeg(){
 app.whenReady().then(async()=>{
   await ensureFFmpeg();
   await require('./startup')();
-  createWindow();
-  // Shell openExternal — registered first to avoid loop
+
+  // ── Register ALL IPC handlers BEFORE creating the window ──────────
+  // This prevents "No handler registered" errors when renderer loads fast
+
+  // Shell — first, with dedup guard
   const{shell}=require('electron');
   ipcMain.removeHandler('shell:openExternal');
   ipcMain.handle('shell:openExternal',async(_,url)=>{await shell.openExternal(url);return{ok:true};});
-  require('./ipc/window')(ipcMain,win);
+
+  // All IPC modules — window.js needs win so we pass a getter
   require('./ipc/db')(ipcMain);
   require('./ipc/channels')(ipcMain);
   require('./ipc/pipeline')(ipcMain);
@@ -72,18 +65,18 @@ app.whenReady().then(async()=>{
   require('./ipc/agents')(ipcMain);
   require('./ipc/scheduler')(ipcMain);
   require('./ipc/settings')(ipcMain);
-  // Handle update install
+
+  // App update handler
   ipcMain.handle('app:installUpdate',()=>{
     try{require('electron-updater').autoUpdater.quitAndInstall();}catch(e){}
   });
+
+  // Create window AFTER all handlers are registered
+  createWindow();
+
+  // Window IPC needs win reference — register after window created
+  require('./ipc/window')(ipcMain,win);
 });
 
-app.on('window-all-closed',()=>app.quit());
-
-// Start background scheduler after app is ready
-app.on('ready',()=>{
-  setTimeout(()=>{
-    try{require('./workers/scheduler').start();}
-    catch(e){console.error('[Scheduler] Failed to start:',e.message);}
-  },5000);
-});
+app.on('window-all-closed',()=>{if(process.platform!=='darwin')app.quit();});
+app.on('activate',()=>{if(BrowserWindow.getAllWindows().length===0)createWindow();});
