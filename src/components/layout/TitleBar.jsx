@@ -1,5 +1,7 @@
 import React,{useState,useRef,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
+import{subscribeNotifications}from '../../utils/notifications';
+import NotificationPanel from '../shared/NotificationPanel';
 
 function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActiveView,loadChannels}){
   const[open,setOpen]=useState(false);

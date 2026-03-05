@@ -8,11 +8,8 @@ import ChannelWizard from './components/views/ChannelWizard';
 import ErrorBoundary from './components/shared/ErrorBoundary';
 import{AppProvider,useApp}from './context/AppContext';
 import{fix,FIX}from './utils/fixRouter';
-import{installGlobalErrorHandlers}from './utils/errorTracker';
 import SystemDoctor from './components/views/SystemDoctor';
 import ToastContainer from './components/shared/ToastContainer';
-
-installGlobalErrorHandlers();
 
 function Inner(){
   const{theme,channels,settings,modal,setModal}=useApp();
