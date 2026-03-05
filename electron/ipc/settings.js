@@ -163,3 +163,63 @@ module.exports=(ipcMain)=>{
 
     return s;
   });
+
+  // Open folder/file picker dialog
+  const{dialog,app}=require('electron');
+  const path=require('path');
+  const fs=require('fs');
+
+  ipcMain.handle('dialog:openFolder',async(_,acceptType)=>{
+    const filters=[];
+    if(acceptType==='image')filters.push({name:'Images',extensions:['png','jpg','jpeg','gif','webp','svg']});
+    else if(acceptType==='video')filters.push({name:'Video',extensions:['mp4','mov','avi','mkv','webm','m4v']});
+    else if(acceptType==='audio')filters.push({name:'Audio',extensions:['mp3','wav','m4a','aac','ogg','flac']});
+    else if(acceptType==='document')filters.push({name:'Documents',extensions:['pdf','txt','md','srt','vtt','csv','docx']});
+    else filters.push({name:'All Media',extensions:['png','jpg','jpeg','gif','mp4','mov','mp3','wav','m4a','pdf','txt','srt']});
+    filters.push({name:'All Files',extensions:['*']});
+
+    const{filePaths,canceled}=await dialog.showOpenDialog({
+      properties:['openFile','multiSelections'],
+      filters,
+    });
+    if(canceled||!filePaths.length)return{files:[]};
+
+    const files=filePaths.map(p=>{
+      try{
+        const stat=fs.statSync(p);
+        const ext=path.extname(p).slice(1).toLowerCase();
+        const typeMap={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',
+          mp4:'video/mp4',mov:'video/quicktime',avi:'video/avi',mkv:'video/x-matroska',webm:'video/webm',
+          mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/m4a',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',
+          pdf:'application/pdf',txt:'text/plain',srt:'text/srt',vtt:'text/vtt',md:'text/markdown'};
+        const mimeType=typeMap[ext]||'application/octet-stream';
+        const data=fs.readFileSync(p);
+        const b64=data.toString('base64');
+        return{name:path.basename(p),path:p,dataUri:`data:${mimeType};base64,${b64}`,type:mimeType,size:stat.size};
+      }catch(e){return{name:path.basename(p),path:p,type:'unknown',size:0};}
+    });
+    return{files};
+  });
+
+  // Import file from URL
+  const https=require('https');
+  const http=require('http');
+  ipcMain.handle('media:importFromUrl',async(_,url)=>{
+    return new Promise((resolve,reject)=>{
+      const client=url.startsWith('https')?https:http;
+      client.get(url,{headers:{'User-Agent':'MediaMill/1.0'}},res=>{
+        if(res.statusCode!==200){reject(new Error(`HTTP ${res.statusCode}`));return;}
+        const chunks=[];
+        res.on('data',c=>chunks.push(c));
+        res.on('end',()=>{
+          const buf=Buffer.concat(chunks);
+          const ct=res.headers['content-type']||'application/octet-stream';
+          const ext=ct.split('/')[1]?.split(';')[0]||'bin';
+          const name=url.split('/').pop().split('?')[0]||`import.${ext}`;
+          const b64=buf.toString('base64');
+          resolve({name,path:url,dataUri:`data:${ct};base64,${b64}`,type:ct,size:buf.length});
+        });
+        res.on('error',reject);
+      }).on('error',reject);
+    });
+  });

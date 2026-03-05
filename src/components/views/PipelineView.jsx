@@ -1,5 +1,81 @@
 import React,{useState,useEffect,useCallback,useRef}from 'react';
 import{useApp}from '../../context/AppContext';
+import MediaPicker from '../shared/MediaPicker';
+
+function CreatorTools({isDark,video}){
+  const[open,setOpen]=useState(false);
+  const[tab,setTab]=useState('footage');
+  const[saving,setSaving]=useState(false);
+  const[assets,setAssets]=useState({footage:[],audio:[],music:[],images:[],script:[],thumbnail:[]});
+  const text=isDark?'#E8E6FF':'#111122';
+  const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
+  const accent=isDark?'#C8FF00':'#4400CC';
+  const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
+  const border=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
+
+  async function save(type,files){
+    setAssets(a=>({...a,[type]:files}));
+    if(!video?.id||!files.length)return;
+    setSaving(true);
+    try{await window.forge.attachCreatorAssets(video.id,type,files.map(f=>({name:f.name,path:f.path,type:f.type,size:f.size})));}
+    catch(e){console.error(e);}
+    setSaving(false);
+  }
+
+  const tabs=[
+    {id:'footage', label:'📹 Footage',   accept:'video',    hint:'Your own clips — used alongside or instead of stock footage'},
+    {id:'audio',   label:'🎙 Voice',     accept:'audio',    hint:'Your narration recording — replaces AI voice for this video'},
+    {id:'music',   label:'🎵 Music',     accept:'audio',    hint:'Background music or sound effects layered during compose'},
+    {id:'images',  label:'🖼 Images',    accept:'image',    hint:'Your photos, graphics, or B-roll stills matched to the script'},
+    {id:'script',  label:'📝 Script',    accept:'document', hint:'Your own script (.txt, .md, .docx) — AI uses this instead of generating'},
+    {id:'thumbnail',label:'🎨 Thumbnail',accept:'image',    hint:'Custom thumbnail — skips AI thumbnail generation'},
+  ];
+
+  const totalFiles=Object.values(assets).flat().length;
+
+  return(
+    <div style={{background:bg,border:'1px solid '+border,borderRadius:14,marginBottom:20,overflow:'hidden'}}>
+      <div onClick={()=>setOpen(o=>!o)}
+        style={{padding:'13px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',
+          borderBottom:open?'1px solid '+border:'none'}}>
+        <div style={{display:'flex',gap:10,alignItems:'center'}}>
+          <span style={{fontSize:16}}>🎨</span>
+          <div>
+            <div style={{fontSize:12,fontWeight:800,color:text}}>Creator Tools — Add Your Own Media</div>
+            <div style={{fontSize:10,color:muted}}>Footage, voice, music, images, script, thumbnail — your content overrides AI defaults</div>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          {totalFiles>0&&<span style={{fontSize:10,fontWeight:700,color:accent,background:accent+'12',padding:'2px 8px',borderRadius:99}}>{totalFiles} file{totalFiles!==1?'s':''} added</span>}
+          {saving&&<span style={{fontSize:10,color:muted}}>⟳ saving…</span>}
+          <span style={{fontSize:10,color:muted}}>{open?'▲':'▼'}</span>
+        </div>
+      </div>
+      {open&&(
+        <div style={{padding:'14px 18px'}}>
+          <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:14}}>
+            {tabs.map(t=>{
+              const c=assets[t.id]?.length||0;
+              return(
+                <button key={t.id} onClick={()=>setTab(t.id)}
+                  style={{fontSize:11,padding:'5px 11px',borderRadius:8,cursor:'pointer',fontWeight:tab===t.id?700:400,
+                    background:tab===t.id?accent+'15':'transparent',
+                    border:'1px solid '+(tab===t.id?accent+'40':border),
+                    color:tab===t.id?accent:muted}}>
+                  {t.label}{c>0&&<span style={{marginLeft:4,fontSize:9,background:accent,color:'#000',borderRadius:99,padding:'1px 5px',fontWeight:800}}>{c}</span>}
+                </button>
+              );
+            })}
+          </div>
+          {tabs.filter(t=>t.id===tab).map(t=>(
+            <MediaPicker key={t.id} isDark={isDark} accept={t.accept} hint={t.hint}
+              existingFiles={assets[t.id]||[]} onFiles={f=>save(t.id,f)}/>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const STAGES=[
   {id:'ingest',label:'Ingest',icon:'📥',desc:'Idea approved, ready to process'},
@@ -377,6 +453,9 @@ export default function PipelineView(){
                 <ScriptViewer script={script} isDark={isDark}/>
               </div>
             )}
+
+            {/* ── Creator Tools ─────────────────────────────────── */}
+            <CreatorTools isDark={isDark} video={selected}/>
 
             {/* Task log */}
             {tasks.length>0&&(

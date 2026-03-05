@@ -1,5 +1,6 @@
 import React,{useState,useEffect,useCallback}from 'react';
 import{useApp}from '../../context/AppContext';
+import MediaPicker from '../shared/MediaPicker';
 
 const STATUS_COLS=[
   {id:'idea',label:'Ideas',color:'#8888FF'},
@@ -94,17 +95,24 @@ function IdeaCard({idea,isDark,onApprove,onReject,onDelete,onEdit}){
 
       {/* Actions */}
       {idea.status==='idea'&&(
-        <div style={{display:'flex',gap:6,paddingTop:8,borderTop:'1px solid '+rowBorder}}>
-          <button onClick={()=>onApprove(idea.id)} className="btn btn-success" style={{flex:1,fontSize:11,padding:'6px 10px'}}>
-            ✓ Approve → Pipeline
-          </button>
-          <button onClick={()=>onEdit(idea)} className="btn btn-ghost" style={{fontSize:11,padding:'6px 10px'}}>
-            ✏ Edit
-          </button>
-          <button onClick={()=>onReject(idea.id)} className="btn btn-danger" style={{fontSize:11,padding:'6px 8px'}}>
-            ✕
-          </button>
-        </div>
+        <>
+          <div style={{paddingTop:8,borderTop:'1px solid '+rowBorder,marginBottom:6}}>
+            <MediaPicker isDark={isDark} compact accept="any"
+              label="Attach reference material"
+              onFiles={files=>{try{window.forge.attachCreatorAssets(idea.id,'reference',files.map(f=>({name:f.name,path:f.path,type:f.type})));}catch(e){}}}/>
+          </div>
+          <div style={{display:'flex',gap:6}}>
+            <button onClick={()=>onApprove(idea.id)} className="btn btn-success" style={{flex:1,fontSize:11,padding:'6px 10px'}}>
+              ✓ Approve → Pipeline
+            </button>
+            <button onClick={()=>onEdit(idea)} className="btn btn-ghost" style={{fontSize:11,padding:'6px 10px'}}>
+              ✏ Edit
+            </button>
+            <button onClick={()=>onReject(idea.id)} className="btn btn-danger" style={{fontSize:11,padding:'6px 8px'}}>
+              ✕
+            </button>
+          </div>
+        </>
       )}
       {idea.status==='approved'&&(
         <div style={{fontSize:10,color:'#00BB66',fontWeight:600,paddingTop:6,borderTop:'1px solid '+rowBorder}}>✓ Sent to pipeline</div>

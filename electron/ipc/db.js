@@ -35,6 +35,7 @@ function runMigrations(){
     ['channels','branding','TEXT DEFAULT NULL'],
     ['channels','formats','TEXT DEFAULT \'["long"]\''],
     ['channels','locked','INTEGER DEFAULT 0'],
+    ['videos','creator_assets','TEXT DEFAULT NULL'],
     ['ideas','origin',"TEXT DEFAULT 'manual'"],
     ['ideas','ai_summary','TEXT DEFAULT NULL'],
     ['videos','idea_id','TEXT DEFAULT NULL'],
@@ -102,3 +103,14 @@ function get(sql,params=[]){return all(sql,params)[0]||null;}
 const dbModule=function(ipcMain){};
 dbModule.getDb=getDb;dbModule.saveDb=saveDb;dbModule.run=run;dbModule.all=all;dbModule.get=get;
 module.exports=dbModule;
+
+  ipcMain.handle('video:attachAssets',async(_,videoId,assetType,files)=>{
+    const db=await getDb();
+    // Store creator assets in video record under creator_assets JSON column
+    const existing=get('SELECT creator_assets FROM videos WHERE id=?',[videoId]);
+    let ca={};
+    try{ca=JSON.parse(existing?.creator_assets||'{}');}catch(e){}
+    ca[assetType]=(ca[assetType]||[]).concat(files);
+    run('UPDATE videos SET creator_assets=? WHERE id=?',[JSON.stringify(ca),videoId]);
+    return{ok:true};
+  });

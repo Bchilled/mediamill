@@ -56,4 +56,7 @@ contextBridge.exposeInMainWorld('forge',{
   updateSettings:(d)=>ipcRenderer.invoke('settings:update',d),
   getSystemStats:()=>ipcRenderer.invoke('settings:systemStats'),
   getSystemStatus:()=>ipcRenderer.invoke('system:status'),
+  openFolderDialog:(accept)=>ipcRenderer.invoke('dialog:openFolder',accept),
+  importFromUrl:(url)=>ipcRenderer.invoke('media:importFromUrl',url),
+  attachCreatorAssets:(videoId,type,files)=>ipcRenderer.invoke('video:attachAssets',videoId,type,files),
 });
