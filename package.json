@@ -6,7 +6,9 @@
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "dev:renderer": "vite",
     "build": "vite build && electron-builder --win",
-    "start": "electron ."
+    "start": "electron .",
+    "electron:build": "vite build && electron-builder",
+    "electron:build:dev": "electron-builder --dir"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -33,13 +35,36 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.bigsexygiantkiller.forge",
-    "productName": "FORGE",
-    "win": {
-      "target": "nsis"
-    },
+    "appId": "com.mediamill.app",
+    "productName": "MediaMill",
     "directories": {
-      "output": "dist-electron"
+      "output": "dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Bchilled",
+      "repo": "mediamill"
     }
   }
 }

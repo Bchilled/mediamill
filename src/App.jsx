@@ -1,11 +1,26 @@
-import React from 'react';
+import React,{useState,useEffect}from 'react';
 import TitleBar from './components/layout/TitleBar';
 import MainPanel from './components/layout/MainPanel';
+import FirstRun from './components/views/FirstRun';
 import{AppProvider,useApp}from './context/AppContext';
 
 function Inner(){
-  const{theme}=useApp();
+  const{theme,channels,settings}=useApp();
   const isDark=theme==='dark';
+  const[firstRun,setFirstRun]=useState(null);// null=loading
+
+  useEffect(()=>{
+    // Show first-run if no channels exist
+    if(channels!==null){
+      const hasKeys=settings?.apiKeys?.claude||settings?.apiKeys?.gemini;
+      setFirstRun(channels.length===0);
+    }
+  },[channels,settings]);
+
+  if(firstRun===null)return null;// Loading
+
+  if(firstRun)return<FirstRun onComplete={()=>setFirstRun(false)}/>;
+
   return(
     <div style={{
       display:'flex',flexDirection:'column',height:'100vh',overflow:'hidden',
@@ -18,4 +33,5 @@ function Inner(){
     </div>
   );
 }
+
 export default function App(){return(<AppProvider><Inner/></AppProvider>);}

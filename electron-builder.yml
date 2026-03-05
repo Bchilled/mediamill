@@ -1,0 +1,45 @@
+appId: com.mediamill.app
+productName: MediaMill
+copyright: Copyright © 2025 MediaMill
+
+directories:
+  output: dist-electron
+  buildResources: build
+
+files:
+  - dist/**/*
+  - electron/**/*
+  - node_modules/**/*
+  - package.json
+
+extraResources:
+  - from: build/ffmpeg.exe
+    to: ffmpeg.exe
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.ico
+  requestedExecutionLevel: asUser
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MediaMill
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeader: build/installerHeader.bmp
+  deleteAppDataOnUninstall: false
+
+publish:
+  provider: github
+  owner: Bchilled
+  repo: mediamill
+  releaseType: release
+
+afterSign: build/notarize.js

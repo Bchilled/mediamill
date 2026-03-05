@@ -5,12 +5,15 @@ const{v4:uuid}=require('uuid');
 const os=require('os');
 
 function findFFmpeg(){
-  // Check common locations
+  // Check env (set by main.js from bundled resource)
+  if(process.env.MEDIAMILL_FFMPEG&&require('fs').existsSync(process.env.MEDIAMILL_FFMPEG))return process.env.MEDIAMILL_FFMPEG;
+  const{app}=require('electron');
+  const userData=app.getPath('userData');
   const candidates=[
-    'ffmpeg',// in PATH
+    require('path').join(userData,'ffmpeg.exe'),
+    'ffmpeg',
     'C:\\ffmpeg\\bin\\ffmpeg.exe',
     'C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe',
-    path.join(process.resourcesPath||'','ffmpeg.exe'),
   ];
   for(const c of candidates){
     try{require('child_process').execSync(`"${c}" -version`,{stdio:'ignore'});return c;}catch(e){}

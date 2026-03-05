@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld('forge',{
   updateVideo:(id,d)=>ipcRenderer.invoke('videos:update',id,d),
   deleteVideo:(id)=>ipcRenderer.invoke('videos:delete',id),
   approveVideo:(id)=>ipcRenderer.invoke('videos:approve',id),
-  // Pipeline
+  // Pipeline stages
   startPipeline:(id)=>ipcRenderer.invoke('pipeline:start',id),
   pipelineStatus:(id)=>ipcRenderer.invoke('pipeline:status',id),
   generateScript:(id)=>ipcRenderer.invoke('pipeline:generateScript',id),
@@ -31,6 +31,12 @@ contextBridge.exposeInMainWorld('forge',{
   approveIdea:(id)=>ipcRenderer.invoke('ideas:approve',id),
   rejectIdea:(id)=>ipcRenderer.invoke('ideas:reject',id),
   scanIdeas:(channelId)=>ipcRenderer.invoke('ideas:scan',channelId),
+  // YouTube
+  youtubeConnect:(channelId)=>ipcRenderer.invoke('youtube:connect',channelId),
+  youtubeStatus:(channelId)=>ipcRenderer.invoke('youtube:status',channelId),
+  youtubeUpload:(videoId)=>ipcRenderer.invoke('youtube:upload',videoId),
+  youtubeAnalytics:(channelId,days)=>ipcRenderer.invoke('youtube:analytics',channelId,days),
+  youtubeDisconnect:(channelId)=>ipcRenderer.invoke('youtube:disconnect',channelId),
   // Agents
   getAgentConfig:()=>ipcRenderer.invoke('agents:getConfig'),
   updateAgentConfig:(c)=>ipcRenderer.invoke('agents:updateConfig',c),
