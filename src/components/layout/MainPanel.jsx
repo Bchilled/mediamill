@@ -7,6 +7,7 @@ import Settings from '../views/Settings';
 import IdeaBoard from '../views/IdeaBoard';
 import PipelineView from '../views/PipelineView';
 import AnalyticsView from '../views/AnalyticsView';
+import ChannelBranding from '../views/ChannelBranding';
 
 const Stub=(name,icon,desc)=>function(){
   const{theme}=useApp();const isDark=theme==='dark';
@@ -79,6 +80,7 @@ const VIEWS={
   'pipeline:review':PipelineView,
   'pipeline:publish':PipelineView,
   'pipeline:analytics':AnalyticsView,
+  'channel:branding':ChannelBranding,
   channels:ChannelsView,
   'new-channel':NewChannel,
   settings:Settings,

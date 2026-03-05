@@ -87,6 +87,9 @@ export default function Dashboard(){
                 🔗 Connect YouTube
               </button>
             )}
+            <button onClick={()=>setActiveView('channel:branding')} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:11}}>
+              🎨 Branding
+            </button>
             <button onClick={()=>setActiveView('pipeline:ideas')} className="btn btn-primary" style={{fontSize:12}}>+ New Video</button>
           </div>
         </div>

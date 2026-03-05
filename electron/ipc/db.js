@@ -32,6 +32,7 @@ function runMigrations(){
     ['channels','voice_engine',"TEXT DEFAULT 'auto'"],
     ['channels','topic','TEXT DEFAULT ""'],
     ['channels','logo_path','TEXT DEFAULT NULL'],
+    ['channels','branding','TEXT DEFAULT NULL'],
     ['videos','idea_id','TEXT DEFAULT NULL'],
     ['videos','description','TEXT DEFAULT ""'],
     ['tasks','channel_id','TEXT DEFAULT NULL'],

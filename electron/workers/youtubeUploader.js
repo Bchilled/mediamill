@@ -172,3 +172,66 @@ async function getVideoStats(videoIds,accessToken){
 }
 
 module.exports={getAuthUrl,exchangeCode,refreshToken,uploadVideo,getAnalytics,getVideoStats,waitForOAuthCode};
+
+async function uploadChannelBanner(imagePath,accessToken){
+  const fs=require('fs');
+  const fileData=fs.readFileSync(imagePath);
+  const fileSize=fileData.length;
+  return new Promise((resolve,reject)=>{
+    const req=https.request({
+      hostname:'www.googleapis.com',
+      path:'/upload/youtube/v3/channelBanners/insert?uploadType=media',
+      method:'POST',
+      headers:{
+        'Authorization':'Bearer '+accessToken,
+        'Content-Type':'image/png',
+        'Content-Length':fileSize,
+      },
+    },res=>{
+      let d='';res.on('data',c=>d+=c);
+      res.on('end',()=>{
+        try{const r=JSON.parse(d);if(r.error)return reject(new Error(r.error.message));resolve(r);}
+        catch(e){reject(e);}
+      });
+    });
+    req.on('error',reject);
+    req.write(fileData);req.end();
+  });
+}
+
+async function setChannelBanner(channelId,bannerUrl,accessToken){
+  const body=JSON.stringify({id:channelId,brandingSettings:{image:{bannerExternalUrl:bannerUrl}}});
+  return new Promise((resolve,reject)=>{
+    const req=https.request({
+      hostname:'www.googleapis.com',
+      path:'/youtube/v3/channels?part=brandingSettings',
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)},
+    },res=>{
+      let d='';res.on('data',c=>d+=c);
+      res.on('end',()=>{try{resolve(JSON.parse(d));}catch(e){resolve({});}});
+    });
+    req.on('error',reject);req.write(body);req.end();
+  });
+}
+
+async function setChannelWatermark(channelId,imagePath,accessToken){
+  const fs=require('fs');
+  const fileData=fs.readFileSync(imagePath);
+  // First upload watermark image
+  const uploadResult=await new Promise((resolve,reject)=>{
+    const req=https.request({
+      hostname:'www.googleapis.com',
+      path:`/youtube/v3/watermarks/set?channelId=${channelId}&uploadType=media`,
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'image/png','Content-Length':fileData.length},
+    },res=>{
+      let d='';res.on('data',c=>d+=c);
+      res.on('end',()=>{try{resolve(JSON.parse(d));}catch(e){resolve({});}});
+    });
+    req.on('error',reject);req.write(fileData);req.end();
+  });
+  return uploadResult;
+}
+
+module.exports={getAuthUrl,exchangeCode,refreshToken,uploadVideo,getAnalytics,getVideoStats,waitForOAuthCode,uploadChannelBanner,setChannelBanner,setChannelWatermark};

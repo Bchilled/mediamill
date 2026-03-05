@@ -164,3 +164,76 @@ function adjustColor(hex,amount){
 }
 
 module.exports={generateChannelLogos,buildLogoPrompt,generateFallbackSVG};
+
+async function generateChannelBanners(channelName,topic,settings,outputDir,count=3){
+  const prompt=buildBannerPrompt(channelName,topic);
+  const results=[];
+
+  if(settings.apiKeys?.openai){
+    try{
+      for(let i=0;i<count;i++){
+        // DALL-E 3 doesn't support 2048x1152 directly — use 1792x1024 (closest)
+        const urls=await generateWithDallE(prompt,settings.apiKeys.openai,'1792x1024');
+        if(urls[0]){
+          const filename=`banner_${uuid()}.png`;
+          const dest=path.join(outputDir,filename);
+          await downloadImage(urls[0],dest);
+          results.push({path:dest,source:'dalle3'});
+        }
+      }
+    }catch(e){console.error('[ImageGen] Banner DALL-E failed:',e.message);}
+  }
+
+  if(results.length===0){
+    // Fallback SVG banners
+    for(let i=0;i<count;i++){
+      const svg=generateFallbackBannerSVG(channelName,topic,i);
+      const filename=`banner_${uuid()}.svg`;
+      const dest=path.join(outputDir,filename);
+      fs.writeFileSync(dest,svg);
+      results.push({path:dest,source:'fallback',svg:true});
+    }
+  }
+  return results;
+}
+
+function generateFallbackBannerSVG(channelName,topic,variant=0){
+  const schemes=[
+    {bg:'#080810',accent:'#C8FF00',text2:'#00C8FF'},
+    {bg:'#0A0A1E',accent:'#00C8FF',text2:'#C8FF00'},
+    {bg:'#111120',accent:'#FF8040',text2:'#C8FF00'},
+  ];
+  const s=schemes[variant%schemes.length];
+  const words=(topic||channelName).split(' ').slice(0,4).join(' ');
+  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 1152" width="2048" height="1152">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${s.bg}"/>
+      <stop offset="100%" stop-color="${adjustColor(s.bg,20)}"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="${s.accent}" stop-opacity="0"/>
+      <stop offset="50%" stop-color="${s.accent}" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="${s.accent}" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="2048" height="1152" fill="url(#bg)"/>
+  <rect width="2048" height="1152" fill="url(#glow)"/>
+  <!-- Grid lines -->
+  ${[...Array(8)].map((_,i)=>`<line x1="${i*290}" y1="0" x2="${i*290}" y2="1152" stroke="${s.accent}" stroke-width="1" opacity="0.06"/>`).join('')}
+  ${[...Array(5)].map((_,i)=>`<line x1="0" y1="${i*288}" x2="2048" y2="${i*288}" stroke="${s.accent}" stroke-width="1" opacity="0.06"/>`).join('')}
+  <!-- Accent bar -->
+  <rect x="0" y="0" width="8" height="1152" fill="${s.accent}" opacity="0.8"/>
+  <rect x="0" y="520" width="2048" height="4" fill="${s.accent}" opacity="0.12"/>
+  <!-- Channel name -->
+  <text x="124" y="540" font-family="Arial Black,Arial,sans-serif" font-size="120" font-weight="900"
+    fill="${s.accent}" dominant-baseline="middle" letter-spacing="-3">${channelName}</text>
+  <!-- Topic -->
+  <text x="128" y="640" font-family="Arial,sans-serif" font-size="48" font-weight="400"
+    fill="${s.text2}" dominant-baseline="middle" opacity="0.7">${words}</text>
+  <!-- Maple leaf accent -->
+  <text x="1900" y="576" font-size="160" text-anchor="middle" dominant-baseline="middle" opacity="0.08">🍁</text>
+</svg>`;
+}
+
+module.exports={generateChannelLogos,generateChannelBanners,buildLogoPrompt,buildBannerPrompt,generateFallbackSVG,generateFallbackBannerSVG};

@@ -33,6 +33,8 @@ contextBridge.exposeInMainWorld('forge',{
   scanIdeas:(channelId)=>ipcRenderer.invoke('ideas:scan',channelId),
   // Channel logos
   generateChannelLogos:(name,topic)=>ipcRenderer.invoke('channel:generateLogos',name,topic),
+  generateChannelBanner:(name,topic)=>ipcRenderer.invoke('channel:generateBanner',name,topic),
+  pushBrandingToYouTube:(channelId,images)=>ipcRenderer.invoke('channel:pushBranding',channelId,images),
   // YouTube
   youtubeConnect:(channelId)=>ipcRenderer.invoke('youtube:connect',channelId),
   youtubeStatus:(channelId)=>ipcRenderer.invoke('youtube:status',channelId),

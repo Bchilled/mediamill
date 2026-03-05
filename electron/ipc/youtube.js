@@ -120,4 +120,50 @@ module.exports=(ipcMain)=>{
     }).filter(Boolean);
   });
 
+
+  // Generate banner options
+  ipcMain.handle('channel:generateBanner',async(_,channelName,topic)=>{
+    await getDb();
+    const settings=await getSettings();
+    const outputDir=ensureDir(path.join(app.getPath('userData'),'logos'));
+    const{generateChannelBanners}=require('../workers/imageGenerator');
+    const banners=await generateChannelBanners(channelName||'Channel',topic||'',settings,outputDir,3);
+    return banners.map(l=>{
+      try{
+        const data=fs.readFileSync(l.path);
+        const ext=l.path.endsWith('.svg')?'svg+xml':'png';
+        return{dataUri:`data:image/${ext};base64,${data.toString('base64')}`,path:l.path,source:l.source};
+      }catch(e){return null;}
+    }).filter(Boolean);
+  });
+
+  // Push all branding to YouTube via API
+  ipcMain.handle('channel:pushBranding',async(_,channelId,images)=>{
+    await getDb();
+    const settings=await getSettings();
+    const accessToken=await getValidToken(channelId,settings);
+    const results={};
+    // YouTube API: upload channel branding (profile photo, banner, watermark)
+    // Profile photo uses Google Account API - not directly in YouTube Data API v3
+    // Banner: PUT https://www.googleapis.com/upload/youtube/v3/channelBanners/insert
+    if(images.banner?.path&&fs.existsSync(images.banner.path)){
+      try{
+        const bannerResult=await uploadChannelBanner(images.banner.path,accessToken);
+        results.banner=bannerResult;
+        // Set banner on channel
+        if(bannerResult.url){
+          await setChannelBanner(channelId,bannerResult.url,accessToken);
+          results.bannerSet=true;
+        }
+      }catch(e){results.bannerError=e.message;}
+    }
+    if(images.watermark?.path&&fs.existsSync(images.watermark.path)){
+      try{
+        await setChannelWatermark(channelId,images.watermark.path,accessToken);
+        results.watermarkSet=true;
+      }catch(e){results.watermarkError=e.message;}
+    }
+    return{ok:true,results};
+  });
+
 };
