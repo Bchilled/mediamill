@@ -9,11 +9,11 @@ const makeStub=(name,icon)=>function(){
   const{theme}=useApp();
   const isDark=theme==='dark';
   return(
-    <div className="flex-1 flex items-center justify-center" style={{color:isDark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.2)'}}>
-      <div className="text-center">
-        <div className="text-5xl mb-4">{icon}</div>
-        <div className="text-lg font-bold mb-1" style={{color:isDark?'#E8E6FF':'#111122'}}>{name}</div>
-        <div className="text-sm">Sprint 2 — Coming soon</div>
+    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:isDark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.25)'}}>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:48,marginBottom:16}}>{icon}</div>
+        <div style={{fontSize:18,fontWeight:700,marginBottom:6,color:isDark?'#E8E6FF':'#111122'}}>{name}</div>
+        <div style={{fontSize:13}}>Sprint 2 — Coming soon</div>
       </div>
     </div>
   );
@@ -33,7 +33,7 @@ export default function MainPanel(){
   const isDark=theme==='dark';
   const View=VIEWS[activeView]||Dashboard;
   return(
-    <div className="flex flex-col overflow-hidden" style={{background:isDark?'#08080F':'#F2F2FC'}}>
+    <div style={{display:'flex',flexDirection:'column',overflow:'hidden',background:isDark?'rgba(8,8,16,0.5)':'rgba(244,244,255,0.6)'}}>
       <TabBar/>
       <View/>
     </div>

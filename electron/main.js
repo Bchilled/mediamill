@@ -8,8 +8,6 @@ function createWindow(){
     frame:false,
     transparent:true,
     backgroundColor:'#00000000',
-    vibrancy:'under-window',
-    visualEffectState:'active',
     roundedCorners:true,
     titleBarStyle:'hidden',
     webPreferences:{
