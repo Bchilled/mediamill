@@ -50,6 +50,8 @@ export default function TabBar(){
 
   return(
     <div style={{display:'flex',alignItems:'center',flexShrink:0,overflowX:'auto',background:bg,borderBottom:'1px solid '+border}}>
+      {tab({id:'dashboard',label:'Dashboard',icon:'⌂'})}
+      <div style={{width:1,height:20,background:sep,margin:'0 4px',flexShrink:0}}/>
       {PIPELINE_TABS.map(t=>tab(t))}
 
       {mode==='advanced'&&(
