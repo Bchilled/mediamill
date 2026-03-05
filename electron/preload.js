@@ -60,4 +60,6 @@ contextBridge.exposeInMainWorld('forge',{
   importFromUrl:(url)=>ipcRenderer.invoke('media:importFromUrl',url),
   attachCreatorAssets:(videoId,type,files)=>ipcRenderer.invoke('video:attachAssets',videoId,type,files),
   generateSubtitles:(videoId,langCode)=>ipcRenderer.invoke('video:generateSubtitles',videoId,langCode),
+  logError:(entry)=>ipcRenderer.invoke('log:error',entry),
+  saveErrorLog:(text)=>ipcRenderer.invoke('log:save',text),
 });

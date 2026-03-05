@@ -1,5 +1,6 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
+import{subscribeErrors}from '../../utils/errorTracker';
 
 const SERVICES=[
   {id:'claude',    label:'Claude',    icon:'🤖', type:'ai'},
@@ -25,6 +26,9 @@ export default function StatusBar(){
   const[statuses,setStatuses]=useState({});
   const[expanded,setExpanded]=useState(false);
   const[lastCheck,setLastCheck]=useState(null);
+  const[errorCount,setErrorCount]=useState(0);
+
+  useEffect(()=>subscribeErrors(errs=>setErrorCount(errs.filter(e=>!e.resolved).length)),[]);
 
   async function checkStatuses(){
     try{
@@ -89,6 +93,12 @@ export default function StatusBar(){
 
         <div style={{display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
           {lastCheck&&<span style={{fontSize:9,color:muted}}>checked {Math.round((Date.now()-lastCheck)/1000)}s ago</span>}
+          {errorCount>0&&(
+            <span style={{fontSize:9,fontWeight:700,color:'#EE2244',background:'rgba(238,34,68,0.12)',
+              padding:'1px 7px',borderRadius:99,border:'1px solid rgba(238,34,68,0.25)'}}>
+              🐛 {errorCount} error{errorCount!==1?'s':''}
+            </span>
+          )}
           <span style={{fontSize:9,color:muted}}>{expanded?'▼':'▲'}</span>
         </div>
       </div>

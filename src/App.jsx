@@ -4,6 +4,7 @@ import MainPanel from './components/layout/MainPanel';
 import TabBar from './components/layout/TabBar';
 import StatusBar from './components/layout/StatusBar';
 import FirstRun from './components/views/FirstRun';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 import{AppProvider,useApp}from './context/AppContext';
 
 function Inner(){
@@ -32,7 +33,9 @@ function Inner(){
     }}>
       <TitleBar/>
       <TabBar/>
-      <MainPanel/>
+      <ErrorBoundary name="MainPanel" isDark={isDark}>
+        <MainPanel/>
+      </ErrorBoundary>
       <StatusBar/>
     </div>
   );

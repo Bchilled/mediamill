@@ -468,7 +468,7 @@ export default function FirstRun({onComplete}){
           'APIs & Services → Library → search "YouTube Data API v3" → Enable',
           'APIs & Services → OAuth consent screen → Test users → + Add your Gmail',
           {text:'Credentials → + Create Credentials →',highlight:'OAuth client ID'},
-          {text:'Application type:',highlight:'Desktop app',' — name it MediaMill, click Create'},
+          {text:'Application type: Desktop app — name it MediaMill, click Create'},
           'Copy the Client ID and Client Secret from the popup',
         ]}/>
 

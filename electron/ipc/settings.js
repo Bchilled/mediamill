@@ -223,3 +223,24 @@ module.exports=(ipcMain)=>{
       }).on('error',reject);
     });
   });
+
+  // Error logging
+  const fs=require('fs');
+  const path=require('path');
+  const{app}=require('electron');
+  const errorLogPath=path.join(app.getPath('userData'),'error-log.jsonl');
+
+  ipcMain.handle('log:error',async(_,entry)=>{
+    try{fs.appendFileSync(errorLogPath,JSON.stringify(entry)+'\n','utf8');}catch(e){}
+    return{ok:true};
+  });
+
+  ipcMain.handle('log:save',async(_,text)=>{
+    const{dialog}=require('electron');
+    const{filePath,canceled}=await dialog.showSaveDialog({
+      defaultPath:'mediamill-errors.txt',
+      filters:[{name:'Text',extensions:['txt']},{name:'All',extensions:['*']}],
+    });
+    if(!canceled&&filePath){fs.writeFileSync(filePath,text,'utf8');return{ok:true};}
+    return{ok:false};
+  });

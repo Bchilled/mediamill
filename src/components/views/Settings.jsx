@@ -2,6 +2,7 @@ import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
 import{useI18n,LANGUAGES}from '../../i18n';
 import{CAPTION_LANGUAGES}from '../../i18n/translations';
+import ErrorLog from '../views/ErrorLog';
 
 const SECTIONS=[
   {id:'language',icon:'🌐',label:'Language',desc:'App & subtitle languages'},
@@ -12,6 +13,7 @@ const SECTIONS=[
   {id:'budget',icon:'💰',label:'Budget & Limits',desc:'Spending controls'},
   {id:'storage',icon:'💾',label:'Storage',desc:'File locations'},
   {id:'advanced',icon:'⚙️',label:'Advanced',desc:'Power user options'},
+  {id:'errors',icon:'🐛',label:'Error Log',desc:'Runtime errors & warnings'},
 ];
 
 const AI_KEYS=[
@@ -286,7 +288,7 @@ export default function Settings(){
     </div>
   );
 
-  const PANELS={language:renderLanguage,ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced};
+  const PANELS={language:renderLanguage,ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced,errors:()=><ErrorLog isDark={isDark}/>};
 
   return(
     <div style={{flex:1,display:'flex',overflow:'hidden'}}>
