@@ -114,3 +114,63 @@ module.exports=dbModule;
     run('UPDATE videos SET creator_assets=? WHERE id=?',[JSON.stringify(ca),videoId]);
     return{ok:true};
   });
+
+  // Generate subtitles for a video in a given language
+  ipcMain.handle('video:generateSubtitles',async(_,videoId,langCode)=>{
+    // Get video and its script
+    const video=get('SELECT * FROM videos WHERE id=?',[videoId]);
+    if(!video)throw new Error('Video not found');
+
+    const settings_row=get("SELECT value FROM settings WHERE key='apiKeys'");
+    const apiKeys=settings_row?JSON.parse(settings_row.value):{};
+
+    let script='';
+    try{const s=JSON.parse(video.script||'{}');script=(s.script||[]).map(seg=>seg.text||'').join('\n\n');}catch(e){}
+
+    if(!script)throw new Error('No script found — generate a script first');
+
+    // Use AI to translate if not English
+    const https=require('https');
+    function aiPost(body){
+      return new Promise((res,rej)=>{
+        const b=JSON.stringify(body);
+        const r=https.request({hostname:'api.anthropic.com',path:'/v1/messages',method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':apiKeys.claude,'anthropic-version':'2023-06-01','Content-Length':Buffer.byteLength(b)}},resp=>{
+          let d='';resp.on('data',c=>d+=c);resp.on('end',()=>res(JSON.parse(d)));
+        });
+        r.on('error',rej);r.write(b);r.end();
+      });
+    }
+
+    let srtContent='';
+    if(langCode==='en'||langCode==='en-CA'){
+      // Convert script to basic SRT
+      const segments=(JSON.parse(video.script||'{}')).script||[];
+      let idx=1,time=0;
+      srtContent=segments.map(seg=>{
+        const dur=Math.max(2,(seg.text?.split(' ').length||10)/3);
+        const start=formatSRT(time);const end=formatSRT(time+dur);
+        time+=dur+0.5;
+        return`${idx++}\n${start} --> ${end}\n${seg.text||''}\n`;
+      }).join('\n');
+    } else if(apiKeys.claude){
+      const prompt=`Translate this script to ${langCode} and format as SRT subtitles. Return ONLY valid SRT format, no preamble.\n\nScript:\n${script}`;
+      const resp=await aiPost({model:'claude-haiku-4-5-20251001',max_tokens:4096,messages:[{role:'user',content:prompt}]});
+      srtContent=resp.content?.[0]?.text||'';
+    } else {
+      throw new Error('Claude API key required for translation. Add it in Settings → AI Models.');
+    }
+
+    // Save SRT to video record
+    const existing=JSON.parse(video.creator_assets||'{}');
+    existing.subtitles=existing.subtitles||{};
+    existing.subtitles[langCode]={content:srtContent,generated_at:new Date().toISOString()};
+    run('UPDATE videos SET creator_assets=? WHERE id=?',[JSON.stringify(existing),videoId]);
+    return{ok:true,langCode,lines:srtContent.split('\n').length};
+  });
+
+  function formatSRT(seconds){
+    const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60),s=Math.floor(seconds%60),ms=Math.floor((seconds%1)*1000);
+    return`${pad(h)}:${pad(m)}:${pad(s)},${String(ms).padStart(3,'0')}`;
+  }
+  function pad(n){return String(n).padStart(2,'0');}

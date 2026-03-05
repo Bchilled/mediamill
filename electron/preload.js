@@ -59,4 +59,5 @@ contextBridge.exposeInMainWorld('forge',{
   openFolderDialog:(accept)=>ipcRenderer.invoke('dialog:openFolder',accept),
   importFromUrl:(url)=>ipcRenderer.invoke('media:importFromUrl',url),
   attachCreatorAssets:(videoId,type,files)=>ipcRenderer.invoke('video:attachAssets',videoId,type,files),
+  generateSubtitles:(videoId,langCode)=>ipcRenderer.invoke('video:generateSubtitles',videoId,langCode),
 });

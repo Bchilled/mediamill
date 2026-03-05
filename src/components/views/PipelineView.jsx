@@ -1,6 +1,7 @@
 import React,{useState,useEffect,useCallback,useRef}from 'react';
 import{useApp}from '../../context/AppContext';
 import MediaPicker from '../shared/MediaPicker';
+import SubtitlesPanel from '../shared/SubtitlesPanel';
 
 function CreatorTools({isDark,video}){
   const[open,setOpen]=useState(false);
@@ -456,6 +457,9 @@ export default function PipelineView(){
 
             {/* ── Creator Tools ─────────────────────────────────── */}
             <CreatorTools isDark={isDark} video={selected}/>
+
+            {/* ── Subtitles & Captions ──────────────────────────── */}
+            <SubtitlesPanel isDark={isDark} video={selected}/>
 
             {/* Task log */}
             {tasks.length>0&&(

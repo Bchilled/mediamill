@@ -1,7 +1,9 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
+import{useI18n,LANGUAGES}from '../../i18n';
 
 const SECTIONS=[
+  {id:'language',icon:'🌐',label:'Language',desc:'App & subtitle languages'},
   {id:'ai',icon:'🤖',label:'AI Models',desc:'Who does the work'},
   {id:'media',icon:'🎬',label:'Media Sources',desc:'Where content comes from'},
   {id:'voice',icon:'🎙',label:'Voice & Audio',desc:'TTS engines'},
@@ -59,8 +61,9 @@ function Card({children,isDark}){
 
 export default function Settings(){
   const{theme,mode,setMode}=useApp();
+  const{t,lang,setLang}=useI18n();
   const isDark=theme==='dark';
-  const[active,setActive]=useState('ai');
+  const[active,setActive]=useState('language');
   const[keys,setKeys]=useState({});
   const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[saved,setSaved]=useState(false);
@@ -236,7 +239,56 @@ export default function Settings(){
     );
   };
 
-  const PANELS={ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced};
+  const renderLanguage=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>🌐 Language</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:20,lineHeight:1.5}}>Choose the language for the MediaMill interface. YouTube subtitles and AI translations are configured per-video in Creator Tools.</p>
+
+      {/* App UI language */}
+      <div style={{marginBottom:24}}>
+        <div style={{fontSize:11,fontWeight:700,color:muted,textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:12}}>App Interface Language</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+          {LANGUAGES.map(l=>{
+            const sel=lang===l.code;
+            return(
+              <div key={l.code} onClick={()=>setLang(l.code)}
+                style={{padding:'12px 14px',borderRadius:12,border:'2px solid '+(sel?accent+'50':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'),
+                  background:sel?accent+'08':'transparent',cursor:'pointer',transition:'all 0.15s',
+                  display:'flex',gap:10,alignItems:'center'}}
+                onMouseEnter={e=>{if(!sel)e.currentTarget.style.borderColor=accent+'30';}}
+                onMouseLeave={e=>{if(!sel)e.currentTarget.style.borderColor=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';}}>
+                <span style={{fontSize:20}}>{l.flag}</span>
+                <div>
+                  <div style={{fontSize:12,fontWeight:sel?800:500,color:sel?accent:text}}>{l.native}</div>
+                  <div style={{fontSize:10,color:muted}}>{l.name}</div>
+                </div>
+                {sel&&<span style={{fontSize:12,color:accent,marginLeft:'auto'}}>✓</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Default subtitle languages for new videos */}
+      <div style={{borderTop:'1px solid '+(isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)'),paddingTop:20}}>
+        <div style={{fontSize:11,fontWeight:700,color:muted,textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:6}}>Default Subtitle Languages for New Videos</div>
+        <div style={{fontSize:12,color:muted,marginBottom:12,lineHeight:1.5}}>These languages will be pre-selected in the Subtitles panel for every new video. You can always change them per-video.</div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+          {['en','en-CA','fr','fr-CA','es','de','zh-Hans','ja','ko','pt-BR','hi','ar'].map(code=>{
+            const{CAPTION_LANGUAGES}=require('../../i18n/translations') || {};
+            return(
+              <div key={code} style={{padding:'5px 12px',borderRadius:8,background:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'),fontSize:11,color:muted}}>
+                {code}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{fontSize:11,color:muted,marginTop:10}}>Subtitle generation uses AI translation — requires Claude or Gemini key.</div>
+      </div>
+    </div>
+  );
+
+  const PANELS={language:renderLanguage,ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced};
 
   return(
     <div style={{flex:1,display:'flex',overflow:'hidden'}}>
