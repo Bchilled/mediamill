@@ -4,7 +4,8 @@ module.exports=(ipcMain)=>{
   ipcMain.handle('channels:getAll',async()=>{await getDb();return all('SELECT * FROM channels ORDER BY created_at ASC');});
   ipcMain.handle('channels:create',async(_,d)=>{
     await getDb();const id=uuid();
-    run('INSERT INTO channels(id,name,preset,style_prompt,voice_profile,publish_schedule,auto_approve,target_length_min,target_length_max)VALUES(?,?,?,?,?,?,?,?,?)',[id,d.name,d.preset||'long',d.style_prompt||'',d.voice_profile||'default',d.publish_schedule||'0 18 * * *',d.auto_approve?1:0,d.target_length_min||20,d.target_length_max||90]);
+    run('INSERT INTO channels(id,name,preset,style_prompt,voice_profile,voice_engine,publish_schedule,auto_approve,target_length_min,target_length_max)VALUES(?,?,?,?,?,?,?,?,?,?)',
+      [id,d.name,d.preset||'long',d.style_prompt||d.topic||'',d.voice_profile||'default',d.voice_engine||'auto',d.publish_schedule||'0 18 * * *',d.auto_approve?1:0,d.target_length_min||20,d.target_length_max||90]);
     return get('SELECT * FROM channels WHERE id=?',[id]);
   });
   ipcMain.handle('channels:update',async(_,id,d)=>{

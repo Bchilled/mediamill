@@ -33,6 +33,7 @@ function initSchema(){
   db.run(`CREATE TABLE IF NOT EXISTS channels(
     id TEXT PRIMARY KEY,name TEXT NOT NULL,preset TEXT DEFAULT 'long',
     style_prompt TEXT DEFAULT '',voice_profile TEXT DEFAULT 'default',
+    voice_engine TEXT DEFAULT 'auto',
     publish_schedule TEXT DEFAULT '0 18 * * *',auto_approve INTEGER DEFAULT 0,
     target_length_min INTEGER DEFAULT 20,target_length_max INTEGER DEFAULT 90,
     created_at TEXT DEFAULT(datetime('now')),updated_at TEXT DEFAULT(datetime('now'))

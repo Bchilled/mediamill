@@ -9,7 +9,7 @@ const TABS=[
   {id:'tasks',label:'Tasks',icon:'📋',advanced:true},
   {id:'prompts',label:'Prompts',icon:'📝',advanced:true},
   {id:'analytics',label:'Analytics',icon:'📊'},
-  {id:'settings',label:'Settings',icon:'⚙️'},
+  // Settings removed — lives in icon nav only
 ];
 
 export default function TabBar(){
@@ -26,11 +26,7 @@ export default function TabBar(){
       {tabs.map(t=>(
         <button key={t.id} onClick={()=>setActiveView(t.id)}
           className="tab-item"
-          style={{
-            color:activeView===t.id?activeColor:inactiveColor,
-            borderBottom:'2px solid '+(activeView===t.id?activeColor:'transparent'),
-            fontWeight:activeView===t.id?700:500,
-          }}
+          style={{color:activeView===t.id?activeColor:inactiveColor,borderBottom:'2px solid '+(activeView===t.id?activeColor:'transparent'),fontWeight:activeView===t.id?700:500}}
           onMouseEnter={e=>{if(activeView!==t.id)e.currentTarget.style.color=isDark?'rgba(255,255,255,0.75)':'rgba(0,0,20,0.8)';}}
           onMouseLeave={e=>{if(activeView!==t.id)e.currentTarget.style.color=inactiveColor;}}>
           <span>{t.icon}</span>
