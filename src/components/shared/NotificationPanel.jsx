@@ -3,9 +3,9 @@ import{subscribeNotifications,markRead,markAllRead,clearNotifications}from '../.
 import{fix}from '../../utils/fixRouter';
 
 const TYPE_CONFIG={
-  success:{color:'#00E676',icon:'✓',label:'Success'},
-  error:  {color:'#EE2244',icon:'✕',label:'Error'},
-  warning:{color:'#FFAA00',icon:'⚠',label:'Warning'},
+  success:{color:'#30C85E',icon:'✓',label:'Success'},
+  error:  {color:'#FF4040',icon:'✕',label:'Error'},
+  warning:{color:'#FF9500',icon:'⚠',label:'Warning'},
   info:   {color:'#00C8FF',icon:'ℹ',label:'Info'},
   system: {color:'#A060FF',icon:'⚙',label:'System'},
 };
@@ -24,13 +24,13 @@ export default function NotificationPanel({onClose,isDark}){
 
   useEffect(()=>subscribeNotifications(setAll),[]);
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.18)':'rgba(0,0,20,0.22)';
   const border=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
   const card=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   const bg=isDark?'rgba(10,10,20,0.98)':'rgba(252,252,255,0.98)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
 
   const unread=all.filter(n=>!n.read).length;
   const filtered=filter==='all'?all:filter==='unread'?all.filter(n=>!n.read):all.filter(n=>n.type===filter);

@@ -23,10 +23,10 @@ function openBrowser(url){
 }
 
 function Screen({isDark,children,title,subtitle,back,next,nextLabel,nextDisabled,skip,saving}){
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   return(
     <div style={{display:'flex',flexDirection:'column',minHeight:'100%'}}>
       {/* Title */}
@@ -67,9 +67,9 @@ function Screen({isDark,children,title,subtitle,back,next,nextLabel,nextDisabled
 
 function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing,hint}){
   const[show,setShow]=useState(false);
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const ok=testResult==='ok';const fail=testResult==='fail';
   return(
     <div>
@@ -79,7 +79,7 @@ function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing,h
           placeholder={placeholder}
           style={{flex:1,padding:'11px 13px',borderRadius:10,fontFamily:'monospace',fontSize:12,
             background:isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',
-            border:'2px solid '+(ok?'#00E676':fail?'#EE2244':isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.12)'),
+            border:'2px solid '+(ok?'#30C85E':fail?'#FF4040':isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.12)'),
             color:text,outline:'none',transition:'border-color 0.2s'}}/>
         <button onClick={()=>setShow(s=>!s)}
           style={{padding:'11px 13px',borderRadius:10,background:'transparent',border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'),color:muted,cursor:'pointer',fontSize:11,flexShrink:0}}>
@@ -93,15 +93,15 @@ function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing,h
           </button>
         )}
       </div>
-      {ok&&<div style={{fontSize:12,fontWeight:700,color:'#00E676'}}>✓ Key verified and working</div>}
-      {fail&&<div style={{fontSize:12,fontWeight:700,color:'#EE2244'}}>✗ Key not working — check and try again</div>}
+      {ok&&<div style={{fontSize:12,fontWeight:700,color:'#30C85E'}}>✓ Key verified and working</div>}
+      {fail&&<div style={{fontSize:12,fontWeight:700,color:'#FF4040'}}>✗ Key not working — check and try again</div>}
     </div>
   );
 }
 
 function Steps({isDark,items}){
   const muted=isDark?'rgba(255,255,255,0.55)':'rgba(0,0,20,0.6)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   return(
     <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:16}}>
@@ -115,7 +115,7 @@ function Steps({isDark,items}){
             </div>
             <div style={{fontSize:12,color:muted,lineHeight:1.5,flex:1}}>
               {t.text}
-              {t.highlight&&<strong style={{color:isDark?'#E8E6FF':'#111122',background:accent+'20',padding:'0 5px',borderRadius:4,margin:'0 3px'}}>{t.highlight}</strong>}
+              {t.highlight&&<strong style={{color:isDark?'#F0EFFF':'#111',background:accent+'20',padding:'0 5px',borderRadius:4,margin:'0 3px'}}>{t.highlight}</strong>}
               {t.url&&<button onClick={()=>openBrowser(t.url)} style={{color:accent,background:'none',border:'none',cursor:'pointer',fontSize:12,padding:'0 3px',textDecoration:'underline'}}>open ↗</button>}
             </div>
           </div>
@@ -145,10 +145,10 @@ export default function FirstRun({onComplete}){
   const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
   const setCh=(k,v)=>setChannel(c=>({...c,[k]:v}));
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.025)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
 
@@ -298,7 +298,7 @@ export default function FirstRun({onComplete}){
 
     need_ai:()=>{
       const AI_PROVIDERS=[
-        {id:'claude',  label:'Claude',   sub:'Best quality · ~$0.01/script · Ideal for Canadian content',badge:'Recommended',color:'#C8FF00'},
+        {id:'claude',  label:'Claude',   sub:'Best quality · ~$0.01/script · Ideal for Canadian content',badge:'Recommended',color:'#7C6EFA'},
         {id:'gemini',  label:'Gemini',   sub:'Google · Free tier · Fast research and B-roll matching',badge:'Free tier',color:'#00C8FF'},
         {id:'openai',  label:'OpenAI',   sub:'GPT-4o · Strong fallback · Great for SEO titles',badge:'Optional',color:'#888'},
         {id:'grok',    label:'Grok',     sub:'xAI · Real-time web access · Good for breaking news',badge:'Optional',color:'#FF8040'},
@@ -314,23 +314,23 @@ export default function FirstRun({onComplete}){
             {AI_PROVIDERS.map(p=>(
               <div key={p.id} onClick={()=>go('add_ai_'+p.id)}
                 style={{padding:'12px 15px',borderRadius:12,
-                  border:'2px solid '+(testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'),
-                  cursor:'pointer',background:testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card,transition:'all 0.12s',display:'flex',alignItems:'center',gap:12}}
+                  border:'2px solid '+(testResults[p.id]==='ok'?'rgba(48,200,94,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'),
+                  cursor:'pointer',background:testResults[p.id]==='ok'?'rgba(48,200,94,0.04)':card,transition:'all 0.12s',display:'flex',alignItems:'center',gap:12}}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor=p.color+'50';e.currentTarget.style.background=p.color+'07';}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor=testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';e.currentTarget.style.background=testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card;}}>
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=testResults[p.id]==='ok'?'rgba(48,200,94,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';e.currentTarget.style.background=testResults[p.id]==='ok'?'rgba(48,200,94,0.04)':card;}}>
                 <div style={{flex:1}}>
                   <div style={{display:'flex',gap:7,alignItems:'center',marginBottom:2}}>
                     <span style={{fontSize:13,fontWeight:800,color:text}}>{p.label}</span>
                     <span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:99,background:p.color+'15',color:p.color,border:'1px solid '+p.color+'25'}}>{p.badge}</span>
-                    {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#00E676'}}>✓ Connected</span>}
+                    {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#30C85E'}}>✓ Connected</span>}
                   </div>
                   <div style={{fontSize:11,color:muted}}>{p.sub}</div>
                 </div>
-                <span style={{fontSize:14,color:testResults[p.id]==='ok'?'#00E676':muted}}>{testResults[p.id]==='ok'?'✓':'→'}</span>
+                <span style={{fontSize:14,color:testResults[p.id]==='ok'?'#30C85E':muted}}>{testResults[p.id]==='ok'?'✓':'→'}</span>
               </div>
             ))}
           </div>
-          <div style={{background:isDark?'rgba(200,255,0,0.04)':'rgba(68,0,204,0.03)',border:'1px solid '+(isDark?'rgba(200,255,0,0.1)':'rgba(68,0,204,0.08)'),borderRadius:10,padding:'9px 12px',marginBottom:10,fontSize:11,color:muted,lineHeight:1.5}}>
+          <div style={{background:isDark?'rgba(124,110,250,0.04)':'rgba(68,0,204,0.03)',border:'1px solid '+(isDark?'rgba(124,110,250,0.1)':'rgba(68,0,204,0.08)'),borderRadius:10,padding:'9px 12px',marginBottom:10,fontSize:11,color:muted,lineHeight:1.5}}>
             💡 More models = more resilience. MediaMill auto-assigns each task to the fastest, cheapest, and most capable model available. You only need one to start.
           </div>
           {connected.length>0&&(
@@ -404,8 +404,8 @@ export default function FirstRun({onComplete}){
         next={()=>go('youtube_intro')} nextLabel="Continue →"
         skip={()=>go('youtube_intro')}>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          <div style={{background:'rgba(0,230,118,0.07)',border:'1px solid rgba(0,230,118,0.2)',borderRadius:12,padding:'12px 14px'}}>
-            <div style={{fontSize:11,fontWeight:700,color:'#00E676',marginBottom:8}}>✓ Always Free — Already Included</div>
+          <div style={{background:'rgba(48,200,94,0.07)',border:'1px solid rgba(48,200,94,0.2)',borderRadius:12,padding:'12px 14px'}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#30C85E',marginBottom:8}}>✓ Always Free — Already Included</div>
             {[
               {icon:'📖',name:'Wikimedia Commons',desc:'Photos, maps, historical images'},
               {icon:'🗄',name:'Internet Archive',desc:'Historical footage, public domain video'},
@@ -427,10 +427,10 @@ export default function FirstRun({onComplete}){
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:s.paid?6:0}}>
                 <div>
                   <span style={{fontSize:13,fontWeight:700,color:text}}>{s.name}</span>
-                  {s.paid&&<span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:99,background:'rgba(255,170,0,0.12)',color:'#FFAA00',border:'1px solid rgba(255,170,0,0.25)',marginLeft:7}}>Paid</span>}
+                  {s.paid&&<span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:99,background:'rgba(255,149,0,0.12)',color:'#FF9500',border:'1px solid rgba(255,149,0,0.25)',marginLeft:7}}>Paid</span>}
                   <div style={{fontSize:11,color:muted,marginTop:2}}>{s.desc}</div>
                 </div>
-                <button onClick={()=>openBrowser(s.url)} style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.07)',color:accent,border:'1px solid '+accent+'25',borderRadius:7,cursor:'pointer',flexShrink:0,marginLeft:10}}>Sign Up ↗</button>
+                <button onClick={()=>openBrowser(s.url)} style={{fontSize:10,padding:'5px 10px',background:'rgba(124,110,250,0.07)',color:accent,border:'1px solid '+accent+'25',borderRadius:7,cursor:'pointer',flexShrink:0,marginLeft:10}}>Sign Up ↗</button>
               </div>
               <KeyInput isDark={isDark} placeholder={s.ph} value={keys[s.key]} onChange={v=>setK(s.key,v)}
                 onTest={()=>testKey(s.key,keys[s.key])} testResult={testResults[s.key]} testing={testing[s.key]}/>
@@ -481,7 +481,7 @@ export default function FirstRun({onComplete}){
         skip={()=>go('channel_name')}>
 
         {/* Access denied fix notice */}
-        <div style={{background:'rgba(255,170,0,0.07)',border:'1px solid rgba(255,170,0,0.2)',borderRadius:10,padding:'10px 13px',marginBottom:14,fontSize:11,color:'#FFAA00',lineHeight:1.5}}>
+        <div style={{background:'rgba(255,149,0,0.07)',border:'1px solid rgba(255,149,0,0.2)',borderRadius:10,padding:'10px 13px',marginBottom:14,fontSize:11,color:'#FF9500',lineHeight:1.5}}>
           ⚠ <strong>Important:</strong> Before connecting, go to Google Cloud → APIs & Services → OAuth consent screen → <strong>Test users</strong> → add your Gmail address. Otherwise you'll get "Access blocked".
         </div>
 
@@ -496,8 +496,8 @@ export default function FirstRun({onComplete}){
 
         <div style={{background:isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)',border:'1px solid '+cardBorder,borderRadius:9,padding:'10px 13px',marginBottom:14,fontSize:11,color:muted}}>
           📋 The popup shows two values:<br/>
-          <span style={{color:'#00E676',fontFamily:'monospace'}}>Client ID:</span> <span style={{fontFamily:'monospace'}}>xxxxxxxxxx.apps.googleusercontent.com</span><br/>
-          <span style={{color:'#00E676',fontFamily:'monospace'}}>Client Secret:</span> <span style={{fontFamily:'monospace'}}>GOCSPX-xxxxx</span>
+          <span style={{color:'#30C85E',fontFamily:'monospace'}}>Client ID:</span> <span style={{fontFamily:'monospace'}}>xxxxxxxxxx.apps.googleusercontent.com</span><br/>
+          <span style={{color:'#30C85E',fontFamily:'monospace'}}>Client Secret:</span> <span style={{fontFamily:'monospace'}}>GOCSPX-xxxxx</span>
         </div>
 
         <div style={{marginBottom:10}}>
@@ -526,14 +526,14 @@ export default function FirstRun({onComplete}){
         {ytConnected?(
           <div style={{textAlign:'center',padding:'32px 0'}}>
             <div style={{fontSize:64,marginBottom:12}}>✅</div>
-            <div style={{fontSize:18,fontWeight:800,color:'#00E676',marginBottom:6}}>YouTube Connected!</div>
+            <div style={{fontSize:18,fontWeight:800,color:'#30C85E',marginBottom:6}}>YouTube Connected!</div>
             <div style={{fontSize:13,color:muted,marginBottom:20}}>MediaMill can now upload to your channel.</div>
             <button onClick={()=>go('channel_name')} className="btn btn-primary" style={{fontSize:13,padding:'11px 28px'}}>Continue →</button>
           </div>
         ):(
           <div>
             {error&&(
-              <div style={{padding:'12px 14px',borderRadius:10,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.25)',color:'#EE2244',fontSize:12,marginBottom:14,lineHeight:1.5}}>
+              <div style={{padding:'12px 14px',borderRadius:10,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.25)',color:'#FF4040',fontSize:12,marginBottom:14,lineHeight:1.5}}>
                 {error}
               </div>
             )}
@@ -624,7 +624,7 @@ export default function FirstRun({onComplete}){
         nextLabel="Continue →">
         <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:14}}>
           {[
-            {id:'short',icon:'⚡',label:'Shorts',desc:'Under 60 seconds — high traffic, best for clips and highlights from longer content',color:'#C8FF00'},
+            {id:'short',icon:'⚡',label:'Shorts',desc:'Under 60 seconds — high traffic, best for clips and highlights from longer content',color:'#7C6EFA'},
             {id:'mid',icon:'📰',label:'Mid-Form',desc:'5–20 minutes — news summaries, explainers, weekly recaps',color:'#00C8FF'},
             {id:'long',icon:'🎬',label:'Long-Form',desc:'20–90 minutes — deep dives, documentaries, full investigations',color:'#FF8040'},
           ].map(f=>{
@@ -661,7 +661,7 @@ export default function FirstRun({onComplete}){
         nextLabel="Create Channel →"
         saving={saving}
         skip={()=>createChannel()}>
-        {error&&<div style={{padding:'10px 13px',borderRadius:9,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',fontSize:12,marginBottom:12}}>{error}</div>}
+        {error&&<div style={{padding:'10px 13px',borderRadius:9,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',fontSize:12,marginBottom:12}}>{error}</div>}
 
         <div style={{display:'flex',justifyContent:'center',gap:16,marginBottom:16,flexWrap:'wrap'}}>
           {generatingLogos&&[0,1,2].map(i=>(
@@ -690,7 +690,7 @@ export default function FirstRun({onComplete}){
         )}
 
         {channel.logo&&(
-          <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'rgba(200,255,0,0.05)',border:'1px solid rgba(200,255,0,0.15)',borderRadius:10}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'rgba(124,110,250,0.05)',border:'1px solid rgba(124,110,250,0.15)',borderRadius:10}}>
             <img src={channel.logo.dataUri} style={{width:36,height:36,borderRadius:'50%',objectFit:'cover',border:'2px solid '+accent}}/>
             <div style={{fontSize:12,color:text}}>Logo selected — <span style={{color:muted}}>you can change this in Channel Branding later</span></div>
           </div>
@@ -726,7 +726,7 @@ export default function FirstRun({onComplete}){
     ),
   };
 
-  const bg=isDark?'linear-gradient(145deg,#0D0D1A,#080810)':'linear-gradient(145deg,#EEEEFF,#F4F4FF)';
+  const bg=isDark?'linear-gradient(145deg,#0C0C0E,#080810)':'linear-gradient(145deg,#EEEEFF,#F4F4FF)';
   const screenIdx=SCREENS.indexOf(screen);
   const progress=screen==='welcome'||screen==='done'?null:Math.round((screenIdx/(SCREENS.length-2))*100);
 

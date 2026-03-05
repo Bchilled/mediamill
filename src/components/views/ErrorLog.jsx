@@ -8,7 +8,7 @@ export default function ErrorLog({isDark}){
 
   useEffect(()=>subscribeErrors(setErrors),[]);
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
   const border=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
@@ -32,8 +32,8 @@ export default function ErrorLog({isDark}){
 
   function sourceColor(src){
     if(src.startsWith('react'))return'#FF8040';
-    if(src.startsWith('ipc'))return'#EE2244';
-    if(src.startsWith('promise'))return'#FFAA00';
+    if(src.startsWith('ipc'))return'#FF4040';
+    if(src.startsWith('promise'))return'#FF9500';
     if(src.startsWith('console'))return'#00C8FF';
     return'#888';
   }
@@ -64,7 +64,7 @@ export default function ErrorLog({isDark}){
           </button>
           <button onClick={clearErrors}
             style={{fontSize:11,padding:'6px 13px',borderRadius:8,cursor:'pointer',
-              background:'rgba(238,34,68,0.07)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244'}}>
+              background:'rgba(255,64,64,0.07)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040'}}>
             🗑 Clear All
           </button>
         </div>
@@ -78,9 +78,9 @@ export default function ErrorLog({isDark}){
           return(
             <button key={t} onClick={()=>setFilter(t)}
               style={{fontSize:11,padding:'4px 10px',borderRadius:7,cursor:'pointer',textTransform:'capitalize',
-                background:active?(isDark?'rgba(200,255,0,0.1)':'rgba(68,0,204,0.07)'):'transparent',
-                border:'1px solid '+(active?(isDark?'rgba(200,255,0,0.3)':'rgba(68,0,204,0.3)'):border),
-                color:active?(isDark?'#C8FF00':'#4400CC'):muted}}>
+                background:active?(isDark?'rgba(124,110,250,0.1)':'rgba(68,0,204,0.07)'):'transparent',
+                border:'1px solid '+(active?(isDark?'rgba(124,110,250,0.3)':'rgba(68,0,204,0.3)'):border),
+                color:active?('#7C6EFA'):muted}}>
               {t}{count>0&&<span style={{marginLeft:4,fontSize:9}}>{count}</span>}
             </button>
           );
@@ -96,20 +96,20 @@ export default function ErrorLog({isDark}){
         <div style={{display:'flex',flexDirection:'column',gap:6}}>
           {filtered.map(e=>(
             <div key={e.id}
-              style={{background:e.resolved?bg:'rgba(238,34,68,0.04)',
-                border:'1px solid '+(e.resolved?border:'rgba(238,34,68,0.15)'),
+              style={{background:e.resolved?bg:'rgba(255,64,64,0.04)',
+                border:'1px solid '+(e.resolved?border:'rgba(255,64,64,0.15)'),
                 borderRadius:10,overflow:'hidden',opacity:e.resolved?0.6:1}}>
               {/* Header row */}
               <div onClick={()=>setExpanded(expanded===e.id?null:e.id)}
                 style={{display:'flex',gap:10,alignItems:'flex-start',padding:'10px 12px',cursor:'pointer'}}>
-                <div style={{width:8,height:8,borderRadius:'50%',background:e.resolved?'#00E676':sourceColor(e.source),flexShrink:0,marginTop:4}}/>
+                <div style={{width:8,height:8,borderRadius:'50%',background:e.resolved?'#30C85E':sourceColor(e.source),flexShrink:0,marginTop:4}}/>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:3,flexWrap:'wrap'}}>
                     <span style={{fontSize:10,fontWeight:700,color:sourceColor(e.source),background:sourceColor(e.source)+'15',padding:'1px 7px',borderRadius:99,flexShrink:0}}>
                       {e.source}
                     </span>
                     <span style={{fontSize:9,color:sub,fontFamily:'monospace',flexShrink:0}}>{fmt(e.timestamp)}</span>
-                    {e.resolved&&<span style={{fontSize:9,color:'#00E676',fontWeight:700}}>✓ resolved</span>}
+                    {e.resolved&&<span style={{fontSize:9,color:'#30C85E',fontWeight:700}}>✓ resolved</span>}
                   </div>
                   <div style={{fontSize:12,fontWeight:600,color:text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
                     {e.message}
@@ -119,7 +119,7 @@ export default function ErrorLog({isDark}){
                   {!e.resolved&&(
                     <button onClick={ev=>{ev.stopPropagation();resolveError(e.id);}}
                       style={{fontSize:9,padding:'3px 8px',borderRadius:6,cursor:'pointer',
-                        background:'rgba(0,230,118,0.08)',border:'1px solid rgba(0,230,118,0.2)',color:'#00E676'}}>
+                        background:'rgba(48,200,94,0.08)',border:'1px solid rgba(48,200,94,0.2)',color:'#30C85E'}}>
                       ✓ Mark resolved
                     </button>
                   )}

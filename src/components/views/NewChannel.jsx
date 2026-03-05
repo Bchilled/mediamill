@@ -3,7 +3,7 @@ import{useApp}from '../../context/AppContext';
 import LogoPicker from './LogoPicker';
 
 const PRESETS={
-  short:{label:'Shorts',icon:'⚡',desc:'Under 60 seconds',color:'#C8FF00'},
+  short:{label:'Shorts',icon:'⚡',desc:'Under 60 seconds',color:'#7C6EFA'},
   mid:{label:'Mid-Form',icon:'📰',desc:'5 – 20 minutes',color:'#00C8FF'},
   long:{label:'Long-Form',icon:'🎬',desc:'20 min – 3 hours',color:'#FF8040'},
 };
@@ -30,7 +30,7 @@ export default function NewChannel(){
   const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))':'linear-gradient(145deg,#FFFFFF,#F8F8FF)';
   const cardBorder=isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.08)';
   const cardShadow=isDark?'0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)':'0 4px 20px rgba(0,0,0,0.08),inset 0 1px 0 rgba(255,255,255,1)';
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,20,0.38)';
   const label=isDark?'rgba(255,255,255,0.28)':'rgba(0,0,20,0.38)';
 
@@ -57,7 +57,7 @@ export default function NewChannel(){
           </div>
         </div>
 
-        {error&&<div style={{marginBottom:16,padding:'12px 16px',borderRadius:10,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',fontSize:13}}>{error}</div>}
+        {error&&<div style={{marginBottom:16,padding:'12px 16px',borderRadius:10,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',fontSize:13}}>{error}</div>}
 
         {/* Name */}
         <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px 24px',marginBottom:14}}>
@@ -77,7 +77,7 @@ export default function NewChannel(){
             {TOPIC_EXAMPLES.map(ex=>(
               <button key={ex} onClick={()=>set('topic',ex)}
                 style={{fontSize:10,padding:'4px 10px',borderRadius:8,border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'),background:'transparent',color:muted,cursor:'pointer'}}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor=isDark?'#C8FF00':'#4400CC';e.currentTarget.style.color=isDark?'#C8FF00':'#4400CC';}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor='#7C6EFA';e.currentTarget.style.color='#7C6EFA';}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)';e.currentTarget.style.color=muted;}}>
                 {ex}
               </button>
@@ -146,8 +146,8 @@ export default function NewChannel(){
               <div style={{fontSize:11,color:muted}}>Skip manual review — pipeline runs fully autonomous</div>
             </div>
             <div onClick={()=>set('auto_approve',!form.auto_approve)} className="toggle"
-              style={{background:form.auto_approve?'rgba(200,255,0,0.15)':'rgba(255,255,255,0.06)',border:'1px solid '+(form.auto_approve?'rgba(200,255,0,0.3)':'rgba(255,255,255,0.1)')}}>
-              <div className="toggle-thumb" style={{left:form.auto_approve?20:3,background:form.auto_approve?'#C8FF00':'rgba(255,255,255,0.3)'}}/>
+              style={{background:form.auto_approve?'rgba(124,110,250,0.15)':'rgba(255,255,255,0.06)',border:'1px solid '+(form.auto_approve?'rgba(124,110,250,0.3)':'rgba(255,255,255,0.1)')}}>
+              <div className="toggle-thumb" style={{left:form.auto_approve?20:3,background:form.auto_approve?'#7C6EFA':'rgba(255,255,255,0.3)'}}/>
             </div>
           </div>
         </div>

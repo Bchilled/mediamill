@@ -142,9 +142,9 @@ const CHECKS=[
 const CATEGORIES=['AI','Publishing','Media','Voice','System','Content'];
 
 function statusColor(s){
-  if(s==='ok')return'#00E676';
-  if(s==='warn')return'#FFAA00';
-  if(s==='error')return'#EE2244';
+  if(s==='ok')return'#30C85E';
+  if(s==='warn')return'#FF9500';
+  if(s==='error')return'#FF4040';
   return'rgba(255,255,255,0.2)';
 }
 
@@ -166,10 +166,10 @@ export default function SystemDoctor({section,onClose}){
 
   useEffect(()=>subscribeErrors(e=>setErrors(e.filter(x=>!x.resolved))),[]);
 
-  const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
+  const text='#F0EFFF';
+  const muted='#9090A0';
   const sub=isDark?'rgba(255,255,255,0.18)':'rgba(0,0,20,0.22)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.035)':'rgba(0,0,0,0.025)';
   const border=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
 
@@ -210,13 +210,13 @@ export default function SystemDoctor({section,onClose}){
   const warnCount=CHECKS.filter(c=>results[c.id]?.status==='warn').length;
   const score=total>0?Math.round((okCount/total)*100):0;
 
-  const scoreColor=score>=80?'#00E676':score>=50?'#FFAA00':'#EE2244';
+  const scoreColor=score>=80?'#30C85E':score>=50?'#FF9500':'#FF4040';
 
   return(
     <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div style={{
         width:'100%',maxWidth:640,maxHeight:'90vh',
-        background:isDark?'rgba(10,10,20,0.98)':'rgba(252,252,255,0.98)',
+        background:'#141416',
         border:'1px solid '+border,
         borderRadius:20,
         boxShadow:'0 32px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08)',
@@ -252,9 +252,9 @@ export default function SystemDoctor({section,onClose}){
             background:isDark?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.02)',
           }}>
             {[
-              {label:'OK',count:okCount,color:'#00E676'},
-              {label:'Warnings',count:warnCount,color:'#FFAA00'},
-              {label:'Errors',count:errCount,color:'#EE2244'},
+              {label:'OK',count:okCount,color:'#30C85E'},
+              {label:'Warnings',count:warnCount,color:'#FF9500'},
+              {label:'Errors',count:errCount,color:'#FF4040'},
             ].map(s=>(
               <div key={s.label} style={{display:'flex',gap:5,alignItems:'center'}}>
                 <span style={{fontSize:7,color:s.color}}>●</span>
@@ -278,7 +278,7 @@ export default function SystemDoctor({section,onClose}){
             const catChecks=cat==='all'?CHECKS:CHECKS.filter(c=>c.category===cat);
             const catErr=catChecks.filter(c=>results[c.id]?.status==='error').length;
             const catWarn=catChecks.filter(c=>results[c.id]?.status==='warn').length;
-            const dot=catErr>0?'#EE2244':catWarn>0?'#FFAA00':null;
+            const dot=catErr>0?'#FF4040':catWarn>0?'#FF9500':null;
             return(
               <button key={cat} onClick={()=>setActiveCategory(cat)}
                 style={{
@@ -307,7 +307,7 @@ export default function SystemDoctor({section,onClose}){
                 <div key={check.id} style={{
                   padding:'12px 14px',borderRadius:12,
                   background:card,
-                  border:'1px solid '+(st==='ok'?'rgba(0,230,118,0.1)':st==='error'?'rgba(238,34,68,0.12)':st==='warn'?'rgba(255,170,0,0.1)':border),
+                  border:'1px solid '+(st==='ok'?'rgba(48,200,94,0.1)':st==='error'?'rgba(255,64,64,0.12)':st==='warn'?'rgba(255,149,0,0.1)':border),
                   display:'flex',gap:12,alignItems:'flex-start',
                 }}>
                   <div style={{width:32,height:32,borderRadius:9,background:color+'12',border:'1px solid '+color+'20',
@@ -350,12 +350,12 @@ export default function SystemDoctor({section,onClose}){
           {errors.length>0&&(activeCategory==='all'||activeCategory==='System')&&(
             <div style={{marginTop:16}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                <div style={{fontSize:12,fontWeight:800,color:'#EE2244'}}>
+                <div style={{fontSize:12,fontWeight:800,color:'#FF4040'}}>
                   🐛 Runtime Errors ({errors.length})
                 </div>
                 <button onClick={clearErrors}
-                  style={{fontSize:10,padding:'3px 8px',borderRadius:5,background:'rgba(238,34,68,0.08)',
-                    border:'1px solid rgba(238,34,68,0.15)',color:'#EE2244',cursor:'pointer'}}>
+                  style={{fontSize:10,padding:'3px 8px',borderRadius:5,background:'rgba(255,64,64,0.08)',
+                    border:'1px solid rgba(255,64,64,0.15)',color:'#FF4040',cursor:'pointer'}}>
                   Clear All
                 </button>
               </div>
@@ -363,12 +363,12 @@ export default function SystemDoctor({section,onClose}){
                 {errors.slice(0,10).map(err=>(
                   <div key={err.id} style={{
                     padding:'10px 12px',borderRadius:10,
-                    background:'rgba(238,34,68,0.04)',
-                    border:'1px solid rgba(238,34,68,0.1)',
+                    background:'rgba(255,64,64,0.04)',
+                    border:'1px solid rgba(255,64,64,0.1)',
                     display:'flex',alignItems:'flex-start',gap:10,
                   }}>
                     <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:10,fontWeight:700,color:'rgba(238,34,68,0.8)',marginBottom:2}}>
+                      <div style={{fontSize:10,fontWeight:700,color:'rgba(255,64,64,0.8)',marginBottom:2}}>
                         [{err.source}]
                       </div>
                       <div style={{fontSize:11,color:text,lineHeight:1.4,
@@ -383,15 +383,15 @@ export default function SystemDoctor({section,onClose}){
                       {err.fixAction&&(
                         <button onClick={()=>{fix(err.fixAction);onClose();}}
                           style={{fontSize:9,padding:'3px 8px',borderRadius:5,
-                            background:'rgba(238,34,68,0.1)',border:'1px solid rgba(238,34,68,0.2)',
-                            color:'#EE2244',cursor:'pointer',fontWeight:700,whiteSpace:'nowrap'}}>
+                            background:'rgba(255,64,64,0.1)',border:'1px solid rgba(255,64,64,0.2)',
+                            color:'#FF4040',cursor:'pointer',fontWeight:700,whiteSpace:'nowrap'}}>
                           {err.fixLabel||'Fix →'}
                         </button>
                       )}
                       <button onClick={()=>resolveError(err.id)}
                         style={{fontSize:9,padding:'3px 6px',borderRadius:5,
-                          background:'rgba(0,230,118,0.08)',border:'1px solid rgba(0,230,118,0.15)',
-                          color:'#00E676',cursor:'pointer'}}>
+                          background:'rgba(48,200,94,0.08)',border:'1px solid rgba(48,200,94,0.15)',
+                          color:'#30C85E',cursor:'pointer'}}>
                         ✓
                       </button>
                     </div>
@@ -417,8 +417,8 @@ export default function SystemDoctor({section,onClose}){
                 const firstErr=CHECKS.find(c=>results[c.id]?.status==='error'&&results[c.id]?.fixAction);
                 if(firstErr){fix(results[firstErr.id].fixAction);onClose();}
               }}
-                style={{fontSize:11,padding:'6px 14px',borderRadius:8,background:'rgba(238,34,68,0.1)',
-                  border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',cursor:'pointer',fontWeight:700}}>
+                style={{fontSize:11,padding:'6px 14px',borderRadius:8,background:'rgba(255,64,64,0.1)',
+                  border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',cursor:'pointer',fontWeight:700}}>
                 Fix Top Error →
               </button>
             )}

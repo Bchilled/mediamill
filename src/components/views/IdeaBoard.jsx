@@ -5,7 +5,7 @@ import MediaPicker from '../shared/MediaPicker';
 const STATUS_COLS=[
   {id:'idea',label:'Ideas',color:'#8888FF'},
   {id:'approved',label:'Approved',color:'#00BB66'},
-  {id:'rejected',label:'Rejected',color:'#EE2244'},
+  {id:'rejected',label:'Rejected',color:'#FF4040'},
 ];
 
 const ORIGINS={
@@ -24,7 +24,7 @@ function IdeaCard({idea,isDark,onApprove,onReject,onDelete,onEdit}){
   const cardShadow=hover
     ?(isDark?'0 12px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1)':'0 8px 30px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,1)')
     :(isDark?'0 4px 20px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.07)':'0 2px 12px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,1)');
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const sub=isDark?'rgba(255,255,255,0.55)':'rgba(0,0,20,0.55)';
   const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,20,0.38)';
   const rowBorder=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
@@ -48,15 +48,15 @@ function IdeaCard({idea,isDark,onApprove,onReject,onDelete,onEdit}){
         <div style={{flex:1,marginRight:8}}>
           <div style={{fontSize:13,fontWeight:700,color:text,lineHeight:1.3,marginBottom:4}}>{idea.title}</div>
           <div style={{display:'flex',alignItems:'center',gap:6}}>
-            <span style={{fontSize:9,padding:'2px 6px',borderRadius:6,background:isDark?'rgba(136,136,255,0.12)':'rgba(80,60,200,0.08)',color:isDark?'#AAAAFF':'#4400CC',border:'1px solid '+(isDark?'rgba(136,136,255,0.2)':'rgba(80,60,200,0.15)'),fontWeight:600}}>
+            <span style={{fontSize:9,padding:'2px 6px',borderRadius:6,background:isDark?'rgba(136,136,255,0.12)':'rgba(80,60,200,0.08)',color:isDark?'#AAAAFF':'#7C6EFA',border:'1px solid '+(isDark?'rgba(136,136,255,0.2)':'rgba(80,60,200,0.15)'),fontWeight:600}}>
               {origin.icon} {origin.label}
             </span>
             {idea.target_length&&<span style={{fontSize:9,color:muted}}>~{idea.target_length}min</span>}
-            {idea.priority>0&&<span style={{fontSize:9,color:'#FFAA00'}}>{'★'.repeat(Math.min(idea.priority,3))}</span>}
+            {idea.priority>0&&<span style={{fontSize:9,color:'#FF9500'}}>{'★'.repeat(Math.min(idea.priority,3))}</span>}
           </div>
         </div>
         <button onClick={()=>onDelete(idea.id)} style={{background:'none',border:'none',cursor:'pointer',color:muted,fontSize:14,padding:'0 2px',lineHeight:1}}
-          onMouseEnter={e=>e.currentTarget.style.color='#EE2244'}
+          onMouseEnter={e=>e.currentTarget.style.color='#FF4040'}
           onMouseLeave={e=>e.currentTarget.style.color=muted}>✕</button>
       </div>
 
@@ -118,7 +118,7 @@ function IdeaCard({idea,isDark,onApprove,onReject,onDelete,onEdit}){
         <div style={{fontSize:10,color:'#00BB66',fontWeight:600,paddingTop:6,borderTop:'1px solid '+rowBorder}}>✓ Sent to pipeline</div>
       )}
       {idea.status==='rejected'&&(
-        <div style={{fontSize:10,color:'#EE2244',fontWeight:600,paddingTop:6,borderTop:'1px solid '+rowBorder}}>✕ Rejected</div>
+        <div style={{fontSize:10,color:'#FF4040',fontWeight:600,paddingTop:6,borderTop:'1px solid '+rowBorder}}>✕ Rejected</div>
       )}
     </div>
   );
@@ -130,7 +130,7 @@ function AddIdeaModal({isDark,channelId,onSave,onClose}){
   const bg=isDark?'rgba(12,12,24,0.98)':'rgba(248,248,255,0.98)';
   const card=isDark?'rgba(255,255,255,0.04)':'#FFFFFF';
   const border=isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.09)';
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,20,0.38)';
 
   async function save(){
@@ -209,7 +209,7 @@ export default function IdeaBoard(){
   const bg='transparent';
   const cardBg=isDark?'rgba(10,10,22,0.6)':'rgba(236,236,252,0.7)';
   const colBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,20,0.38)';
   const label=isDark?'rgba(255,255,255,0.28)':'rgba(0,0,20,0.38)';
 

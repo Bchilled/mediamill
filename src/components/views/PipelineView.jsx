@@ -8,9 +8,9 @@ function CreatorTools({isDark,video}){
   const[tab,setTab]=useState('footage');
   const[saving,setSaving]=useState(false);
   const[assets,setAssets]=useState({footage:[],audio:[],music:[],images:[],script:[],thumbnail:[]});
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   const border=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
 
@@ -90,12 +90,12 @@ const STAGES=[
 
 const STATUS_COLOR={
   pending:'#888899',processing:'#00C8FF',review:'#FF8040',
-  approved:'#00E676',published:'#C8FF00',failed:'#EE2244',
+  approved:'#30C85E',published:'#7C6EFA',failed:'#FF4040',
 };
 
 function StageBar({currentStage,status,isDark}){
   const stageIdx=STAGES.findIndex(s=>s.id===currentStage);
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,20,0.35)';
   return(
     <div style={{display:'flex',alignItems:'center',padding:'16px 0',overflowX:'auto'}}>
@@ -103,7 +103,7 @@ function StageBar({currentStage,status,isDark}){
         const done=stageIdx>i||(stageIdx===i&&status==='approved')||status==='published';
         const active=stageIdx===i&&status!=='published';
         const failed=active&&status==='failed';
-        const color=failed?'#EE2244':done||active?STATUS_COLOR[status]||'#C8FF00':'rgba(255,255,255,0.1)';
+        const color=failed?'#FF4040':done||active?STATUS_COLOR[status]||'#7C6EFA':'rgba(255,255,255,0.1)';
         return(
           <React.Fragment key={s.id}>
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,flexShrink:0}}>
@@ -131,12 +131,12 @@ function StageBar({currentStage,status,isDark}){
 
 function ScriptViewer({script,isDark}){
   const[tab,setTab]=useState('script');
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.25)':'rgba(0,0,20,0.3)';
   const card=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   const border=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const tabs=['script','seo','broll','chapters'];
 
   return(
@@ -222,11 +222,11 @@ function ScriptViewer({script,isDark}){
 }
 
 function VideoCard({video,isDark,onSelect,isSelected}){
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))':'linear-gradient(145deg,#fff,#f8f8ff)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const sc=STATUS_COLOR[video.status]||'#888';
 
   return(
@@ -263,12 +263,12 @@ export default function PipelineView(){
   const pollRef=useRef(null);
   const isDark=theme==='dark';
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.25)':'rgba(0,0,20,0.3)';
   const panelBg=isDark?'rgba(8,8,18,0.6)':'rgba(236,236,252,0.7)';
   const border=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
 
   const addLog=(msg,type='info')=>setLog(l=>[{msg,type,time:new Date().toLocaleTimeString()},...l].slice(0,50));
 
@@ -467,7 +467,7 @@ export default function PipelineView(){
                 <div style={{fontSize:11,fontWeight:700,color:muted,letterSpacing:'0.15em',textTransform:'uppercase',marginBottom:12}}>Task Log</div>
                 <div style={{display:'flex',flexDirection:'column',gap:6}}>
                   {tasks.map(t=>{
-                    const tc=t.status==='completed'?'#00E676':t.status==='failed'?'#EE2244':'#00C8FF';
+                    const tc=t.status==='completed'?'#30C85E':t.status==='failed'?'#FF4040':'#00C8FF';
                     return(
                       <div key={t.id} style={{display:'flex',gap:10,alignItems:'flex-start',fontSize:11}}>
                         <span style={{color:tc,flexShrink:0,marginTop:1}}>{t.status==='completed'?'✓':t.status==='failed'?'✕':'⟳'}</span>
@@ -494,7 +494,7 @@ export default function PipelineView(){
           {log.map((l,i)=>(
             <div key={i} style={{fontSize:10,lineHeight:1.4}}>
               <div style={{color:sub,fontFamily:'monospace',fontSize:9}}>{l.time}</div>
-              <div style={{color:l.type==='error'?'#EE2244':l.type==='success'?'#00E676':muted}}>{l.msg}</div>
+              <div style={{color:l.type==='error'?'#FF4040':l.type==='success'?'#30C85E':muted}}>{l.msg}</div>
             </div>
           ))}
         </div>

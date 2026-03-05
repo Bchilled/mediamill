@@ -14,7 +14,7 @@ const Stub=(name,icon,desc)=>function(){
   return(<div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center'}}>
     <div style={{textAlign:'center',color:isDark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.2)'}}>
       <div style={{fontSize:48,marginBottom:16}}>{icon}</div>
-      <div style={{fontSize:17,fontWeight:700,marginBottom:6,color:isDark?'#E8E6FF':'#111122'}}>{name}</div>
+      <div style={{fontSize:17,fontWeight:700,marginBottom:6,color:isDark?'#F0EFFF':'#0C0C0E'}}>{name}</div>
       <div style={{fontSize:12}}>{desc||'Coming soon'}</div>
     </div>
   </div>);
@@ -23,11 +23,11 @@ const Stub=(name,icon,desc)=>function(){
 function ChannelsView(){
   const{channels,activeChannel,setActiveChannel,setActiveView,theme}=useApp();
   const isDark=theme==='dark';
-  const text=isDark?'#E8E6FF':'#111122';const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
+  const text=isDark?'#F0EFFF':'#0C0C0E';const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025))':'linear-gradient(145deg,#fff,#f8f8ff)';
   const cardBorder=isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.08)';
   const cardShadow=isDark?'0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)':'0 4px 20px rgba(0,0,0,0.08),inset 0 1px 0 #fff';
-  const PC={short:'#C8FF00',mid:'#00C8FF',long:'#FF8040'};const accent=isDark?'#C8FF00':'#4400CC';
+  const PC={short:'#7C6EFA',mid:'#00C8FF',long:'#FF8040'};const accent='#7C6EFA';
   return(
     <div style={{flex:1,overflowY:'auto',padding:32}}>
       <div style={{maxWidth:800,margin:'0 auto'}}>

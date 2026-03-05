@@ -11,13 +11,13 @@ export default function Dashboard(){
   const[togglingAuto,setTogglingAuto]=useState(false);
   const isDark=theme==='dark';
 
-  const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const sub=isDark?'rgba(255,255,255,0.22)':'rgba(0,0,20,0.28)';
-  const accent=isDark?'#C8FF00':'#4400CC';
-  const card=isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.85)';
-  const cardBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
-  const cardShadow=isDark?'0 2px 12px rgba(0,0,0,0.3)':'0 2px 12px rgba(0,0,0,0.06)';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
+  const muted=isDark?'#9090A0':'#666';
+  const sub=isDark?'rgba(255,255,255,0.22)':'rgba(0,0,0,0.3)';
+  const accent='#7C6EFA';
+  const card=isDark?'#141416':'#fff';
+  const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';
+  const cardShadow=isDark?'0 2px 20px rgba(0,0,0,0.4)':'0 2px 12px rgba(0,0,0,0.06)';
 
   useEffect(()=>{if(activeChannel)loadData();},[activeChannel?.id]);
 
@@ -71,12 +71,12 @@ export default function Dashboard(){
   const ytUrl=activeChannel.youtube_id?`https://youtube.com/channel/${activeChannel.youtube_id}`:null;
 
   const statCards=[
-    {label:'Ideas',  value:stats?.ideas||0,  icon:'💡',view:'pipeline:ideas', color:'#888'},
-    {label:'Pending',value:stats?.pending||0, icon:'⏳',view:'pipeline:ideas', color:'#888899'},
-    {label:'In Progress',value:stats?.processing||0,icon:'⚡',view:null,color:'#00C8FF'},
-    {label:'Review', value:stats?.review||0,  icon:'👁',view:'pipeline:review',color:'#FF8040'},
-    {label:'Published',value:stats?.published||0,icon:'🚀',view:'pipeline:publish',color:'#C8FF00'},
-    {label:'Failed', value:stats?.failed||0,  icon:'✗',view:null,             color:'#EE2244'},
+    {label:'Ideas',  value:stats?.ideas||0,  icon:'💡',view:'pipeline:ideas', color:'#9090A0'},
+    {label:'Pending',value:stats?.pending||0, icon:'⏳',view:'pipeline:ideas', color:'#7070A0'},
+    {label:'In Progress',value:stats?.processing||0,icon:'⚡',view:null,color:'#30C85E'},
+    {label:'Review', value:stats?.review||0,  icon:'👁',view:'pipeline:review',color:'#FF9500'},
+    {label:'Published',value:stats?.published||0,icon:'🚀',view:'pipeline:publish',color:'#30C85E'},
+    {label:'Failed', value:stats?.failed||0,  icon:'✗',view:null,             color:'#FF4040'},
   ];
 
   return(
@@ -90,15 +90,15 @@ export default function Dashboard(){
             <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
               <span style={{fontSize:11,color:muted,textTransform:'capitalize'}}>{activeChannel.preset}-Form</span>
               <span style={{color:sub}}>·</span>
-              <span style={{fontSize:11,color:activeChannel.auto_approve?'#00E676':muted}}>
+              <span style={{fontSize:11,color:activeChannel.auto_approve?'#30C85E':muted}}>
                 {activeChannel.auto_approve?'⚡ Full Auto':'👁 Manual review'}
               </span>
               <span style={{color:sub}}>·</span>
               {ytStatus?.connected?(
                 ytUrl?<a href="#" onClick={e=>{e.preventDefault();window.forge.openExternal(ytUrl);}} style={{fontSize:11,color:accent,textDecoration:'none'}}>youtube.com/channel ↗</a>
-                :<span style={{fontSize:11,color:'#00E676'}}>✓ YouTube connected</span>
+                :<span style={{fontSize:11,color:'#30C85E'}}>✓ YouTube connected</span>
               ):(
-                <span style={{fontSize:11,color:'#EE2244'}}>✗ YouTube not connected</span>
+                <span style={{fontSize:11,color:'#FF4040'}}>✗ YouTube not connected</span>
               )}
             </div>
             {activeChannel.topic&&<div style={{fontSize:11,color:sub,marginTop:4,fontStyle:'italic'}}>"{activeChannel.topic}"</div>}
@@ -107,11 +107,11 @@ export default function Dashboard(){
             {/* Full Auto toggle */}
             <button onClick={toggleAutoApprove} disabled={togglingAuto}
               style={{display:'flex',alignItems:'center',gap:7,padding:'7px 13px',borderRadius:9,cursor:'pointer',fontSize:11,fontWeight:600,
-                background:activeChannel.auto_approve?'rgba(0,230,118,0.1)':'rgba(255,255,255,0.05)',
-                border:'1px solid '+(activeChannel.auto_approve?'rgba(0,230,118,0.3)':'rgba(255,255,255,0.12)'),
-                color:activeChannel.auto_approve?'#00E676':muted}}>
-              <div style={{width:28,height:16,borderRadius:99,background:activeChannel.auto_approve?'rgba(0,230,118,0.3)':'rgba(255,255,255,0.1)',position:'relative',transition:'all 0.2s'}}>
-                <div style={{width:12,height:12,borderRadius:'50%',background:activeChannel.auto_approve?'#00E676':'rgba(255,255,255,0.4)',position:'absolute',top:2,left:activeChannel.auto_approve?14:2,transition:'all 0.2s'}}/>
+                background:activeChannel.auto_approve?'rgba(48,200,94,0.1)':'rgba(255,255,255,0.05)',
+                border:'1px solid '+(activeChannel.auto_approve?'rgba(48,200,94,0.3)':'rgba(255,255,255,0.12)'),
+                color:activeChannel.auto_approve?'#30C85E':muted}}>
+              <div style={{width:28,height:16,borderRadius:99,background:activeChannel.auto_approve?'rgba(48,200,94,0.3)':'rgba(255,255,255,0.1)',position:'relative',transition:'all 0.2s'}}>
+                <div style={{width:12,height:12,borderRadius:'50%',background:activeChannel.auto_approve?'#30C85E':'rgba(255,255,255,0.4)',position:'absolute',top:2,left:activeChannel.auto_approve?14:2,transition:'all 0.2s'}}/>
               </div>
               Full Auto
             </button>

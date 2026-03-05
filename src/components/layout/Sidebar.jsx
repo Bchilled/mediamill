@@ -2,7 +2,7 @@ import React from 'react';
 import{useApp}from '../../context/AppContext';
 
 const PS={
-  short:{color:'#C8FF00',label:'Short'},
+  short:{color:'#7C6EFA',label:'Short'},
   mid:{color:'#00C8FF',label:'Mid'},
   long:{color:'#FF8040',label:'Long'},
 };
@@ -12,7 +12,7 @@ export default function Sidebar(){
   const isDark=theme==='dark';
   const bg=isDark?'rgba(10,10,22,0.7)':'rgba(240,240,255,0.8)';
   const border=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.45)':'rgba(0,0,20,0.5)';
   const label=isDark?'rgba(255,255,255,0.28)':'rgba(0,0,20,0.38)';
 
@@ -36,8 +36,8 @@ export default function Sidebar(){
             <div key={ch.id} onClick={()=>setActiveChannel(ch)}
               className="sidebar-item"
               style={isActive?{
-                background:isDark?'rgba(200,255,0,0.07)':'rgba(80,60,200,0.07)',
-                boxShadow:'inset 3px 0 0 '+(isDark?'#C8FF00':'#4400CC'),
+                background:isDark?'rgba(124,110,250,0.07)':'rgba(80,60,200,0.07)',
+                boxShadow:'inset 3px 0 0 '+('#7C6EFA'),
               }:{}}>
               <div style={{display:'flex',alignItems:'center',gap:6,fontWeight:600,fontSize:13,marginBottom:3,color:text}}>
                 <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{ch.name}</span>
@@ -63,9 +63,9 @@ export default function Sidebar(){
             fontSize:12,padding:'9px',borderRadius:10,
           }}
           onMouseEnter={e=>{
-            e.currentTarget.style.borderColor=isDark?'#C8FF00':'#4400CC';
-            e.currentTarget.style.color=isDark?'#C8FF00':'#4400CC';
-            e.currentTarget.style.background=isDark?'rgba(200,255,0,0.05)':'rgba(68,0,204,0.05)';
+            e.currentTarget.style.borderColor='#7C6EFA';
+            e.currentTarget.style.color='#7C6EFA';
+            e.currentTarget.style.background=isDark?'rgba(124,110,250,0.05)':'rgba(68,0,204,0.05)';
           }}
           onMouseLeave={e=>{
             e.currentTarget.style.borderColor=isDark?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.18)';

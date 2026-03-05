@@ -4,7 +4,7 @@ import{useApp}from '../../context/AppContext';
 function openBrowser(url){try{window.forge.openExternal(url);}catch(e){console.error(e);}}
 
 function Screen({isDark,children,title,subtitle,back,next,nextLabel,nextDisabled,skip,saving}){
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
   return(
@@ -50,10 +50,10 @@ export default function ChannelWizard({onClose,onCreated}){
   const setCh=(k,v)=>setChannel(c=>({...c,[k]:v}));
   const go=(s)=>{setError('');setScreen(s);};
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.025)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
 
@@ -204,7 +204,7 @@ export default function ChannelWizard({onClose,onCreated}){
         next={channel.formats.length>0?()=>go('youtube'):null} nextLabel="Continue →">
         <div style={{display:'flex',flexDirection:'column',gap:9,marginBottom:10}}>
           {[
-            {id:'short',icon:'⚡',label:'Shorts',desc:'Under 60s — high traffic, clips and highlights',color:'#C8FF00'},
+            {id:'short',icon:'⚡',label:'Shorts',desc:'Under 60s — high traffic, clips and highlights',color:'#7C6EFA'},
             {id:'mid',  icon:'📰',label:'Mid-Form',desc:'5–20 min — news summaries, explainers',color:'#00C8FF'},
             {id:'long', icon:'🎬',label:'Long-Form',desc:'20–90 min — deep dives, documentaries',color:'#FF8040'},
           ].map(f=>{
@@ -238,14 +238,14 @@ export default function ChannelWizard({onClose,onCreated}){
         {ytConnected?(
           <div style={{textAlign:'center',padding:'24px 0'}}>
             <div style={{fontSize:56,marginBottom:10}}>✅</div>
-            <div style={{fontSize:16,fontWeight:800,color:'#00E676',marginBottom:6}}>YouTube Connected!</div>
+            <div style={{fontSize:16,fontWeight:800,color:'#30C85E',marginBottom:6}}>YouTube Connected!</div>
             <div style={{fontSize:12,color:muted,marginBottom:16}}>MediaMill can now upload to this channel.</div>
             <button onClick={()=>go('logo')} className="btn btn-primary" style={{fontSize:13,padding:'11px 28px'}}>Continue →</button>
           </div>
         ):(
           <div>
             <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12}}>
-              <div style={{background:'rgba(255,170,0,0.06)',border:'1px solid rgba(255,170,0,0.2)',borderRadius:9,padding:'9px 12px',fontSize:11,color:'#FFAA00',lineHeight:1.5}}>
+              <div style={{background:'rgba(255,149,0,0.06)',border:'1px solid rgba(255,149,0,0.2)',borderRadius:9,padding:'9px 12px',fontSize:11,color:'#FF9500',lineHeight:1.5}}>
                 ⚠ Before connecting: Go to Google Cloud → OAuth consent screen → Test users → add your Gmail address.
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:5,fontSize:11,color:muted}}>
@@ -270,7 +270,7 @@ export default function ChannelWizard({onClose,onCreated}){
                   background:isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',
                   border:'1px solid '+cardBorder,color:text,outline:'none'}}/>
             </div>
-            {error&&<div style={{fontSize:11,color:'#EE2244',marginBottom:10,lineHeight:1.5}}>{error}</div>}
+            {error&&<div style={{fontSize:11,color:'#FF4040',marginBottom:10,lineHeight:1.5}}>{error}</div>}
             <button onClick={connectYouTube} disabled={ytConnecting||!keys.youtube_client_id||!keys.youtube_client_secret}
               className="btn btn-primary"
               style={{width:'100%',padding:'12px',fontSize:13,opacity:ytConnecting||!keys.youtube_client_id||!keys.youtube_client_secret?0.5:1}}>
@@ -287,7 +287,7 @@ export default function ChannelWizard({onClose,onCreated}){
         next={()=>createChannel()} nextLabel="Create Channel →"
         saving={saving}
         skip={()=>createChannel()}>
-        {error&&<div style={{padding:'9px 12px',borderRadius:9,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',fontSize:12,marginBottom:10}}>{error}</div>}
+        {error&&<div style={{padding:'9px 12px',borderRadius:9,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',fontSize:12,marginBottom:10}}>{error}</div>}
         <div style={{display:'flex',justifyContent:'center',gap:14,marginBottom:14,flexWrap:'wrap'}}>
           {generatingLogos&&[0,1,2].map(i=>(
             <div key={i} style={{width:88,height:88,borderRadius:'50%',background:card}}/>

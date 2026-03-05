@@ -20,7 +20,7 @@ export default function IconNav(){
   const isDark=theme==='dark';
   const bg=isDark?'rgba(8,8,18,0.6)':'rgba(235,235,252,0.7)';
   const border=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
-  const activeColor=isDark?'#C8FF00':'#4400CC';
+  const activeColor='#7C6EFA';
 
   return(
     <div style={{
@@ -39,7 +39,7 @@ export default function IconNav(){
               <div style={{
                 position:'absolute',left:'calc(100% + 10px)',top:'50%',transform:'translateY(-50%)',
                 background:isDark?'rgba(20,20,35,0.98)':'rgba(255,255,255,0.98)',
-                color:isDark?'#E8E6FF':'#111122',
+                color:isDark?'#F0EFFF':'#0C0C0E',
                 border:'1px solid '+(isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)'),
                 borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,
                 whiteSpace:'nowrap',zIndex:999,

@@ -4,10 +4,10 @@ import{useApp}from '../../context/AppContext';
 function openBrowser(url){try{window.forge.openExternal(url);}catch(e){console.error(e);}}
 
 function Screen({isDark,children,title,subtitle,back,next,nextLabel,nextDisabled,skip,saving}){
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   return(
     <div style={{display:'flex',flexDirection:'column',minHeight:'100%'}}>
       {title&&(<div style={{marginBottom:24,textAlign:'center'}}>
@@ -35,9 +35,9 @@ function Screen({isDark,children,title,subtitle,back,next,nextLabel,nextDisabled
 
 function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing}){
   const[show,setShow]=useState(false);
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const ok=testResult==='ok';const fail=testResult==='fail';
   return(
     <div>
@@ -46,7 +46,7 @@ function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing})
           placeholder={placeholder}
           style={{flex:1,padding:'11px 13px',borderRadius:10,fontFamily:'monospace',fontSize:12,
             background:isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',
-            border:'2px solid '+(ok?'#00E676':fail?'#EE2244':isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.12)'),
+            border:'2px solid '+(ok?'#30C85E':fail?'#FF4040':isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.12)'),
             color:text,outline:'none',transition:'border-color 0.2s'}}/>
         <button onClick={()=>setShow(s=>!s)}
           style={{padding:'11px 13px',borderRadius:10,background:'transparent',border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'),color:muted,cursor:'pointer',fontSize:11,flexShrink:0}}>
@@ -58,15 +58,15 @@ function KeyInput({isDark,placeholder,value,onChange,onTest,testResult,testing})
           {testing?'⟳':'Test'}
         </button>)}
       </div>
-      {ok&&<div style={{fontSize:12,fontWeight:700,color:'#00E676'}}>✓ Key verified and working</div>}
-      {fail&&<div style={{fontSize:12,fontWeight:700,color:'#EE2244'}}>✗ Key not working — check and try again</div>}
+      {ok&&<div style={{fontSize:12,fontWeight:700,color:'#30C85E'}}>✓ Key verified and working</div>}
+      {fail&&<div style={{fontSize:12,fontWeight:700,color:'#FF4040'}}>✗ Key not working — check and try again</div>}
     </div>
   );
 }
 
 function Steps({isDark,items}){
   const muted=isDark?'rgba(255,255,255,0.55)':'rgba(0,0,20,0.6)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   return(
     <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:14}}>
@@ -80,7 +80,7 @@ function Steps({isDark,items}){
             </div>
             <div style={{fontSize:12,color:muted,lineHeight:1.5,flex:1}}>
               {t.text}
-              {t.highlight&&<strong style={{color:isDark?'#E8E6FF':'#111122',background:accent+'20',padding:'0 5px',borderRadius:4,margin:'0 3px'}}>{t.highlight}</strong>}
+              {t.highlight&&<strong style={{color:isDark?'#F0EFFF':'#111',background:accent+'20',padding:'0 5px',borderRadius:4,margin:'0 3px'}}>{t.highlight}</strong>}
               {t.url&&<button onClick={()=>openBrowser(t.url)} style={{color:accent,background:'none',border:'none',cursor:'pointer',fontSize:12,padding:'0 3px',textDecoration:'underline'}}>open ↗</button>}
             </div>
           </div>
@@ -105,10 +105,10 @@ export default function SystemSetup({onClose}){
   const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
   const go=(s)=>{setError('');setScreen(s);};
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.025)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
 
@@ -134,7 +134,7 @@ export default function SystemSetup({onClose}){
   }
 
   const AI_PROVIDERS=[
-    {id:'claude',  label:'Claude',   sub:'Best quality · ~$0.01/script · Best for scripts and SEO',badge:'Recommended',color:'#C8FF00'},
+    {id:'claude',  label:'Claude',   sub:'Best quality · ~$0.01/script · Best for scripts and SEO',badge:'Recommended',color:'#7C6EFA'},
     {id:'gemini',  label:'Gemini',   sub:'Google · Free tier · Fast research and B-roll matching',badge:'Free tier',color:'#00C8FF'},
     {id:'openai',  label:'OpenAI',   sub:'GPT-4o · Strong fallback · Great for SEO titles',badge:'Optional',color:'#888'},
     {id:'grok',    label:'Grok',     sub:'xAI · Real-time web access · Breaking news',badge:'Optional',color:'#FF8040'},
@@ -181,7 +181,7 @@ export default function SystemSetup({onClose}){
 
   const MEDIA_KEYS=[
     {key:'pexels',    label:'Pexels',    badge:'Free',color:'#00C8FF',url:'https://www.pexels.com/api/',ph:'...',what:'Stock photos and videos'},
-    {key:'pixabay',   label:'Pixabay',   badge:'Free',color:'#00E676',url:'https://pixabay.com/api/docs/',ph:'...',what:'Stock photos and videos'},
+    {key:'pixabay',   label:'Pixabay',   badge:'Free',color:'#30C85E',url:'https://pixabay.com/api/docs/',ph:'...',what:'Stock photos and videos'},
     {key:'elevenlabs',label:'ElevenLabs',badge:'Paid',color:'#FF8040',url:'https://elevenlabs.io',ph:'...',what:'Premium AI voice narration'},
   ];
 
@@ -200,20 +200,20 @@ export default function SystemSetup({onClose}){
           {AI_PROVIDERS.map(p=>(
             <div key={p.id} onClick={()=>go('ai_'+p.id)}
               style={{padding:'11px 14px',borderRadius:11,
-                border:'2px solid '+(testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':cardBorder),
-                cursor:'pointer',background:testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card,
+                border:'2px solid '+(testResults[p.id]==='ok'?'rgba(48,200,94,0.4)':cardBorder),
+                cursor:'pointer',background:testResults[p.id]==='ok'?'rgba(48,200,94,0.04)':card,
                 transition:'all 0.12s',display:'flex',alignItems:'center',gap:11}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor=p.color+'50';e.currentTarget.style.background=p.color+'07';}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':cardBorder;e.currentTarget.style.background=testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card;}}>
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=testResults[p.id]==='ok'?'rgba(48,200,94,0.4)':cardBorder;e.currentTarget.style.background=testResults[p.id]==='ok'?'rgba(48,200,94,0.04)':card;}}>
               <div style={{flex:1}}>
                 <div style={{display:'flex',gap:7,alignItems:'center',marginBottom:2}}>
                   <span style={{fontSize:13,fontWeight:800,color:text}}>{p.label}</span>
                   <span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:99,background:p.color+'15',color:p.color,border:'1px solid '+p.color+'25'}}>{p.badge}</span>
-                  {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#00E676'}}>✓ Connected</span>}
+                  {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#30C85E'}}>✓ Connected</span>}
                 </div>
                 <div style={{fontSize:11,color:muted}}>{p.sub}</div>
               </div>
-              <span style={{fontSize:13,color:testResults[p.id]==='ok'?'#00E676':muted}}>{testResults[p.id]==='ok'?'✓':'→'}</span>
+              <span style={{fontSize:13,color:testResults[p.id]==='ok'?'#30C85E':muted}}>{testResults[p.id]==='ok'?'✓':'→'}</span>
             </div>
           ))}
         </div>
@@ -259,8 +259,8 @@ export default function SystemSetup({onClose}){
         back={()=>go('ai')}
         next={()=>saveAndGo(null)} nextLabel="Save & Done ✓"
         skip={onClose}>
-        <div style={{background:'rgba(0,230,118,0.06)',border:'1px solid rgba(0,230,118,0.15)',borderRadius:10,padding:'10px 13px',marginBottom:12}}>
-          <div style={{fontSize:11,fontWeight:700,color:'#00E676',marginBottom:6}}>✓ Always Free — No Key Needed</div>
+        <div style={{background:'rgba(48,200,94,0.06)',border:'1px solid rgba(48,200,94,0.15)',borderRadius:10,padding:'10px 13px',marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:700,color:'#30C85E',marginBottom:6}}>✓ Always Free — No Key Needed</div>
           <div style={{fontSize:11,color:muted}}>Wikimedia Commons · Internet Archive · Unsplash Basic</div>
         </div>
         <div style={{display:'flex',flexDirection:'column',gap:7}}>
@@ -270,7 +270,7 @@ export default function SystemSetup({onClose}){
                 <span style={{fontSize:13,fontWeight:700,color:text}}>{m.label}</span>
                 <span style={{fontSize:9,padding:'1px 6px',borderRadius:99,background:m.color+'15',color:m.color,fontWeight:700}}>{m.badge}</span>
                 <a onClick={()=>openBrowser(m.url)} style={{fontSize:10,color:muted,cursor:'pointer',marginLeft:'auto',textDecoration:'underline'}}>Get key ↗</a>
-                {testResults[m.key]==='ok'&&<span style={{fontSize:10,color:'#00E676',fontWeight:700}}>✓</span>}
+                {testResults[m.key]==='ok'&&<span style={{fontSize:10,color:'#30C85E',fontWeight:700}}>✓</span>}
               </div>
               <div style={{fontSize:11,color:sub,marginBottom:8}}>{m.what}</div>
               <KeyInput isDark={isDark} placeholder={m.ph} value={keys[m.key]||''} onChange={v=>setK(m.key,v)}
@@ -282,7 +282,7 @@ export default function SystemSetup({onClose}){
     ),
   };
 
-  const bg=isDark?'linear-gradient(145deg,#0D0D1A,#080810)':'linear-gradient(145deg,#EEEEFF,#F4F4FF)';
+  const bg=isDark?'linear-gradient(145deg,#0C0C0E,#080810)':'linear-gradient(145deg,#EEEEFF,#F4F4FF)';
   const TABS=[{id:'ai',label:'🤖 AI Models'},{id:'media',label:'🎬 Media Sources'}];
   const topTab=screen.startsWith('ai')?'ai':'media';
 

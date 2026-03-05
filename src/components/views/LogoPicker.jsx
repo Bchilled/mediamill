@@ -5,10 +5,10 @@ export default function LogoPicker({channelName,topic,isDark,onSelect,selected})
   const[loading,setLoading]=useState(false);
   const[generated,setGenerated]=useState(false);
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.25)':'rgba(0,0,20,0.3)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.025)';
   const cardBorder=isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.08)';
 
@@ -80,7 +80,7 @@ export default function LogoPicker({channelName,topic,isDark,onSelect,selected})
           </div>
 
           {selected&&(
-            <div style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',background:isDark?'rgba(200,255,0,0.06)':'rgba(68,0,204,0.05)',borderRadius:9,border:'1px solid '+(isDark?'rgba(200,255,0,0.15)':'rgba(68,0,204,0.12)')}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',background:isDark?'rgba(124,110,250,0.06)':'rgba(68,0,204,0.05)',borderRadius:9,border:'1px solid '+(isDark?'rgba(124,110,250,0.15)':'rgba(68,0,204,0.12)')}}>
               <img src={selected.dataUri} alt="Selected logo"
                 style={{width:32,height:32,borderRadius:'50%',objectFit:'cover',border:'2px solid '+accent}}/>
               <div>

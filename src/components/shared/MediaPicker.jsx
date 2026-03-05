@@ -36,10 +36,10 @@ export default function MediaPicker({
   const[importing,setImporting]=useState(false);
   const fileRef=useRef();
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.2)':'rgba(0,0,20,0.25)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const bg=isDark?'rgba(255,255,255,0.025)':'rgba(0,0,0,0.02)';
   const border=isDark?'rgba(255,255,255,0.09)':'rgba(0,0,0,0.09)';
 
@@ -142,7 +142,7 @@ export default function MediaPicker({
                 {f.path&&f.path!==f.name&&<div style={{fontSize:9,color:sub,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginTop:1}}>{f.path}</div>}
               </div>
               <button onClick={()=>remove(i)}
-                style={{padding:'4px 9px',borderRadius:7,background:'rgba(238,34,68,0.07)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',cursor:'pointer',fontSize:11,flexShrink:0}}>✕</button>
+                style={{padding:'4px 9px',borderRadius:7,background:'rgba(255,64,64,0.07)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',cursor:'pointer',fontSize:11,flexShrink:0}}>✕</button>
             </div>
           ))}
           {files.length>1&&(

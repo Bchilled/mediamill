@@ -27,10 +27,10 @@ const ASSETS=[
 
 function AssetCard({asset,channel,isDark,onGenerate,onUpload,currentImage,generating}){
   const fileRef=useRef();
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const sub=isDark?'rgba(255,255,255,0.22)':'rgba(0,0,20,0.3)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))':'linear-gradient(145deg,#fff,#f8f8ff)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
   const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.07)':'0 2px 16px rgba(0,0,0,0.07),inset 0 1px 0 #fff';
@@ -102,7 +102,7 @@ function AssetCard({asset,channel,isDark,onGenerate,onUpload,currentImage,genera
 }
 
 function OptionsPicker({options,selected,onSelect,onClose,onMore,loading,isDark,shape}){
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   return(
     <div style={{
@@ -110,12 +110,12 @@ function OptionsPicker({options,selected,onSelect,onClose,onMore,loading,isDark,
       display:'flex',alignItems:'center',justifyContent:'center',zIndex:9000,padding:24,
     }} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div style={{
-        background:isDark?'#0D0D1A':'#EEEEFF',
+        background:isDark?'#0C0C0E':'#EEEEFF',
         border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'),
         borderRadius:20,padding:28,maxWidth:520,width:'100%',
         boxShadow:'0 32px 80px rgba(0,0,0,0.6)',
       }}>
-        <div style={{fontSize:16,fontWeight:800,color:isDark?'#E8E6FF':'#111122',marginBottom:6}}>Choose an option</div>
+        <div style={{fontSize:16,fontWeight:800,color:isDark?'#F0EFFF':'#0C0C0E',marginBottom:6}}>Choose an option</div>
         <div style={{fontSize:12,color:muted,marginBottom:20}}>Click one to select, or generate more options</div>
         <div style={{display:'flex',gap:16,justifyContent:'center',flexWrap:'wrap',marginBottom:20}}>
           {options.map((opt,i)=>(
@@ -158,9 +158,9 @@ export default function ChannelBranding(){
   const[ytStatus,setYtStatus]=useState(null);
   const[error,setError]=useState('');
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
 
   useEffect(()=>{
     if(!activeChannel)return;
@@ -253,7 +253,7 @@ export default function ChannelBranding(){
             <div style={{fontSize:12,color:muted}}>{activeChannel.name} · Profile photo, banner, watermark</div>
           </div>
           <div style={{display:'flex',gap:8,alignItems:'center'}}>
-            {saved&&<span style={{fontSize:12,fontWeight:600,color:'#00E676'}}>✓ Saved</span>}
+            {saved&&<span style={{fontSize:12,fontWeight:600,color:'#30C85E'}}>✓ Saved</span>}
             <button onClick={saveAll} disabled={saving||!hasAny} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:12,opacity:!hasAny?0.4:1}}>
               {saving?'Saving…':'Save'}
             </button>
@@ -265,13 +265,13 @@ export default function ChannelBranding(){
 
         {/* YouTube status */}
         {!ytStatus?.connected&&(
-          <div style={{padding:'10px 16px',borderRadius:10,background:'rgba(255,170,0,0.08)',border:'1px solid rgba(255,170,0,0.2)',fontSize:12,color:'#FFAA00',marginBottom:20}}>
+          <div style={{padding:'10px 16px',borderRadius:10,background:'rgba(255,149,0,0.08)',border:'1px solid rgba(255,149,0,0.2)',fontSize:12,color:'#FF9500',marginBottom:20}}>
             ⚠ YouTube not connected — images will save locally but won't push to your channel until you connect in Settings.
           </div>
         )}
 
         {error&&(
-          <div style={{padding:'10px 16px',borderRadius:10,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.2)',fontSize:12,color:'#EE2244',marginBottom:20}}>{error}</div>
+          <div style={{padding:'10px 16px',borderRadius:10,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.2)',fontSize:12,color:'#FF4040',marginBottom:20}}>{error}</div>
         )}
 
         {/* Asset cards */}

@@ -9,12 +9,12 @@ export default function AnalyticsView(){
   const[ytStatus,setYtStatus]=useState(null);
   const isDark=theme==='dark';
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
   const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))':'linear-gradient(145deg,#fff,#f8f8ff)';
   const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
   const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.07)':'0 2px 16px rgba(0,0,0,0.07),inset 0 1px 0 #fff';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)';
 
   useEffect(()=>{
@@ -71,7 +71,7 @@ export default function AnalyticsView(){
           </div>
         </div>
 
-        {error&&<div style={{padding:'12px 16px',borderRadius:10,background:'rgba(238,34,68,0.08)',border:'1px solid rgba(238,34,68,0.2)',color:'#EE2244',fontSize:13,marginBottom:20}}>{error}</div>}
+        {error&&<div style={{padding:'12px 16px',borderRadius:10,background:'rgba(255,64,64,0.08)',border:'1px solid rgba(255,64,64,0.2)',color:'#FF4040',fontSize:13,marginBottom:20}}>{error}</div>}
 
         {!ytStatus?.connected&&(
           <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'40px',textAlign:'center',marginBottom:24}}>
@@ -100,8 +100,8 @@ export default function AnalyticsView(){
             <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:14,marginBottom:20}}>
               {[
                 {label:'Views',val:totalViews.toLocaleString(),icon:'👁',color:'#00C8FF'},
-                {label:'Watch Hours',val:Math.round(totalMins/60).toLocaleString(),icon:'⏱',color:'#C8FF00'},
-                {label:'Revenue',val:'$'+totalRevenue.toFixed(2),icon:'💰',color:'#00E676'},
+                {label:'Watch Hours',val:Math.round(totalMins/60).toLocaleString(),icon:'⏱',color:'#7C6EFA'},
+                {label:'Revenue',val:'$'+totalRevenue.toFixed(2),icon:'💰',color:'#30C85E'},
                 {label:'New Subs',val:(totalSubs>0?'+':'')+totalSubs.toLocaleString(),icon:'👤',color:'#FF8040'},
               ].map(s=>(
                 <div key={s.label} style={{background:card,border:'1px solid '+cardBorder,borderRadius:14,boxShadow:cardShadow,padding:'18px',textAlign:'center',borderTop:'3px solid '+s.color}}>

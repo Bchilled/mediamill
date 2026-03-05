@@ -3,9 +3,9 @@ import{subscribeToasts}from '../../utils/notifications';
 import{fix}from '../../utils/fixRouter';
 
 const TYPE_CONFIG={
-  success:{color:'#00E676',bg:'rgba(0,230,118,0.08)',border:'rgba(0,230,118,0.2)',icon:'✓'},
-  error:  {color:'#EE2244',bg:'rgba(238,34,68,0.08)', border:'rgba(238,34,68,0.2)', icon:'✕'},
-  warning:{color:'#FFAA00',bg:'rgba(255,170,0,0.08)',  border:'rgba(255,170,0,0.2)',  icon:'⚠'},
+  success:{color:'#30C85E',bg:'rgba(48,200,94,0.08)',border:'rgba(48,200,94,0.2)',icon:'✓'},
+  error:  {color:'#FF4040',bg:'rgba(255,64,64,0.08)', border:'rgba(255,64,64,0.2)', icon:'✕'},
+  warning:{color:'#FF9500',bg:'rgba(255,149,0,0.08)',  border:'rgba(255,149,0,0.2)',  icon:'⚠'},
   info:   {color:'#00C8FF',bg:'rgba(0,200,255,0.07)',  border:'rgba(0,200,255,0.18)', icon:'ℹ'},
   system: {color:'#A060FF',bg:'rgba(160,96,255,0.07)', border:'rgba(160,96,255,0.18)',icon:'⚙'},
 };
@@ -69,7 +69,7 @@ function Toast({n,onDismiss}){
 
       {/* Content */}
       <div style={{flex:1,minWidth:0}}>
-        <div style={{fontSize:12,fontWeight:700,color:'#E8E6FF',marginBottom:n.message?2:0,
+        <div style={{fontSize:12,fontWeight:700,color:'#F0EFFF',marginBottom:n.message?2:0,
           whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
           {n.title}
         </div>

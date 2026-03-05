@@ -19,7 +19,7 @@ const SECTIONS=[
 ];
 
 const AI_KEYS=[
-  {key:'claude',label:'Claude',badge:'Recommended',bc:'#C8FF00',icon:'🧠',company:'Anthropic',link:'https://console.anthropic.com',ph:'sk-ant-...',what:'Writes scripts, SEO titles, descriptions, tags, and analyzes performance.',when:'Script generation, SEO, analytics.'},
+  {key:'claude',label:'Claude',badge:'Recommended',bc:'#7C6EFA',icon:'🧠',company:'Anthropic',link:'https://console.anthropic.com',ph:'sk-ant-...',what:'Writes scripts, SEO titles, descriptions, tags, and analyzes performance.',when:'Script generation, SEO, analytics.'},
   {key:'gemini',label:'Gemini',badge:'Recommended',bc:'#00C8FF',icon:'✨',company:'Google',link:'https://aistudio.google.com/app/apikey',ph:'AIza...',what:'Research, fact-checking, asset matching, high-volume cheap tasks.',when:'Content research, asset gathering, validation.'},
   {key:'openai',label:'OpenAI (GPT-4)',badge:'Optional',bc:'#888',icon:'⚡',company:'OpenAI',link:'https://platform.openai.com/api-keys',ph:'sk-...',what:'Fallback if Claude or Gemini hit rate limits.',when:'Only when primary models are unavailable.'},
 ];
@@ -119,13 +119,13 @@ export default function Settings(){
 
   function setPref(k,v){setAppPrefs(p=>({...p,[k]:v}));}
 
-  const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'rgba(255,255,255,0.45)':'rgba(0,0,20,0.5)';
+  const text=isDark?'#F0EFFF':'#111';
+  const muted=isDark?'#9090A0':'#666';
   const sub=isDark?'rgba(255,255,255,0.28)':'rgba(0,0,20,0.35)';
-  const navBg=isDark?'rgba(8,8,18,0.7)':'rgba(232,232,248,0.8)';
+  const navBg=isDark?'#0C0C0E':'#F5F5F7';
   const navBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
   const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const card=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   const cardBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
   const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
@@ -245,9 +245,9 @@ export default function Settings(){
 
       <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,margin:'20px 0 8px'}}>Notify Me When</div>
       {[
-        {key:'success',icon:'✓',label:'Video completed / uploaded',color:'#00E676'},
-        {key:'error',  icon:'✕',label:'Errors and failures',color:'#EE2244'},
-        {key:'warning',icon:'⚠',label:'Warnings and degraded service',color:'#FFAA00'},
+        {key:'success',icon:'✓',label:'Video completed / uploaded',color:'#30C85E'},
+        {key:'error',  icon:'✕',label:'Errors and failures',color:'#FF4040'},
+        {key:'warning',icon:'⚠',label:'Warnings and degraded service',color:'#FF9500'},
         {key:'info',   icon:'ℹ',label:'Info and status updates',color:'#00C8FF'},
         {key:'system', icon:'⚙',label:'System events (scheduler, updates)',color:'#A060FF'},
       ].map(t=>(
@@ -314,7 +314,7 @@ export default function Settings(){
                   <div style={{fontSize:10,color:sub}}>{f.company}</div>
                 </div>
               </div>
-              <a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Get Key ↗</a>
+              <a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(124,110,250,0.08)',color:'#7C6EFA',border:'1px solid rgba(124,110,250,0.2)',textDecoration:'none'}}>Get Key ↗</a>
             </div>
             <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what} <span style={{color:sub}}>Runs during: {f.when}</span></p>
           </div>
@@ -337,12 +337,12 @@ export default function Settings(){
                 <div>
                   <div style={{display:'flex',gap:8,alignItems:'center'}}>
                     <span style={{fontSize:13,fontWeight:700,color:text}}>{f.label}</span>
-                    <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.free?'rgba(0,230,118,0.12)':'rgba(255,170,0,0.12)',color:f.free?'#00E676':'#FFAA00',border:'1px solid '+(f.free?'rgba(0,230,118,0.2)':'rgba(255,170,0,0.2)')}}>{f.free?'Free API':'Paid'}</span>
+                    <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.free?'rgba(48,200,94,0.12)':'rgba(255,149,0,0.12)',color:f.free?'#30C85E':'#FF9500',border:'1px solid '+(f.free?'rgba(48,200,94,0.2)':'rgba(255,149,0,0.2)')}}>{f.free?'Free API':'Paid'}</span>
                   </div>
                   <div style={{fontSize:10,color:sub}}>{f.company}</div>
                 </div>
               </div>
-              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Get Key ↗</a>}
+              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(124,110,250,0.08)',color:'#7C6EFA',border:'1px solid rgba(124,110,250,0.2)',textDecoration:'none'}}>Get Key ↗</a>}
             </div>
             <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what}</p>
           </div>
@@ -364,10 +364,10 @@ export default function Settings(){
                 <span style={{fontSize:20}}>{f.icon}</span>
                 <div style={{display:'flex',gap:8,alignItems:'center'}}>
                   <span style={{fontSize:13,fontWeight:700,color:text}}>{f.label}</span>
-                  <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.cost==='Free'?'rgba(0,230,118,0.12)':'rgba(0,200,255,0.12)',color:f.cost==='Free'?'#00E676':'#00C8FF',border:'1px solid '+(f.cost==='Free'?'rgba(0,230,118,0.2)':'rgba(0,200,255,0.2)')}}>{f.cost}</span>
+                  <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.cost==='Free'?'rgba(48,200,94,0.12)':'rgba(0,200,255,0.12)',color:f.cost==='Free'?'#30C85E':'#00C8FF',border:'1px solid '+(f.cost==='Free'?'rgba(48,200,94,0.2)':'rgba(0,200,255,0.2)')}}>{f.cost}</span>
                 </div>
               </div>
-              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Sign Up ↗</a>}
+              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(124,110,250,0.08)',color:'#7C6EFA',border:'1px solid rgba(124,110,250,0.2)',textDecoration:'none'}}>Sign Up ↗</a>}
             </div>
             <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what}</p>
           </div>
@@ -408,7 +408,7 @@ export default function Settings(){
         <div style={{padding:'16px 18px'}}>
           <div style={{fontSize:13,fontWeight:600,color:text,marginBottom:4}}>YouTube Data API Key</div>
           <div style={{fontSize:11,color:muted,marginBottom:12}}>Required to upload videos and pull analytics from YouTube Studio.</div>
-          <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none',display:'inline-flex',marginBottom:12}}>Google Cloud Console ↗</a>
+          <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(124,110,250,0.08)',color:'#7C6EFA',border:'1px solid rgba(124,110,250,0.2)',textDecoration:'none',display:'inline-flex',marginBottom:12}}>Google Cloud Console ↗</a>
           <KeyField ph="AIza..." value={keys.youtube_data} onChange={v=>setK('youtube_data',v)} isDark={isDark}/>
         </div>
       </Card>
@@ -423,7 +423,7 @@ export default function Settings(){
         {[{l:'Database',p:'%APPDATA%\\MediaMill\\forge.db',d:'Channels, videos, ideas, tasks'},{l:'Scripts',p:'%APPDATA%\\MediaMill\\scripts\\',d:'Generated scripts + SEO data'},{l:'Assets',p:'%APPDATA%\\MediaMill\\assets\\',d:'Downloaded images and clips'},{l:'Voice',p:'%APPDATA%\\MediaMill\\voice\\',d:'Rendered audio files'},{l:'Videos',p:'%APPDATA%\\MediaMill\\output\\',d:'Final rendered videos'}].map((s,i,arr)=>(
           <div key={s.l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 18px',borderBottom:i<arr.length-1?'1px solid '+rowBorder:'none'}}>
             <div><div style={{fontSize:12,fontWeight:600,color:text}}>{s.l}</div><div style={{fontSize:10,color:muted}}>{s.d}</div></div>
-            <div style={{fontSize:10,fontFamily:'monospace',color:isDark?'rgba(200,255,0,0.55)':'rgba(68,0,204,0.55)'}}>{s.p}</div>
+            <div style={{fontSize:10,fontFamily:'monospace',color:isDark?'rgba(124,110,250,0.55)':'rgba(68,0,204,0.55)'}}>{s.p}</div>
           </div>
         ))}
       </Card>
@@ -507,7 +507,7 @@ export default function Settings(){
         {SECTIONS.map(s=>{
           const isActive=active===s.id;
           return(
-            <button key={s.id} onClick={()=>setActive(s.id)} style={{width:'100%',display:'flex',alignItems:'center',gap:10,padding:'9px 14px',background:isActive?(isDark?'rgba(200,255,0,0.07)':'rgba(68,0,204,0.06)'):'transparent',border:'none',borderLeft:'3px solid '+(isActive?accent:'transparent'),cursor:'pointer',textAlign:'left',transition:'all 0.1s'}}
+            <button key={s.id} onClick={()=>setActive(s.id)} style={{width:'100%',display:'flex',alignItems:'center',gap:10,padding:'9px 14px',background:isActive?(isDark?'rgba(124,110,250,0.07)':'rgba(68,0,204,0.06)'):'transparent',border:'none',borderLeft:'3px solid '+(isActive?accent:'transparent'),cursor:'pointer',textAlign:'left',transition:'all 0.1s'}}
               onMouseEnter={e=>{if(!isActive)e.currentTarget.style.background=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)';}}
               onMouseLeave={e=>{if(!isActive)e.currentTarget.style.background='transparent';}}>
               <span style={{fontSize:15}}>{s.icon}</span>
@@ -521,7 +521,7 @@ export default function Settings(){
           {PANELS[active]?.()}
           <div style={{marginTop:24,display:'flex',alignItems:'center',gap:12}}>
             <button onClick={save} className="btn btn-primary" style={{padding:'10px 24px'}}>Save Settings</button>
-            {saved&&<span style={{fontSize:12,fontWeight:600,color:'#00E676'}}>✓ Saved</span>}
+            {saved&&<span style={{fontSize:12,fontWeight:600,color:'#30C85E'}}>✓ Saved</span>}
           </div>
         </div>
       </div>

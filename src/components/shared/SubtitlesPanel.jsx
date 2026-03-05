@@ -5,13 +5,13 @@ import MediaPicker from './MediaPicker';
 
 // Per-language subtitle entry
 function LangRow({isDark,lang,status,onGenerate,onRemove,onUploadSrt,generating}){
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const border=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
   const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
 
-  const statusColor={generated:'#00E676',uploaded:'#00C8FF',burned:'#FF8040',error:'#EE2244'}[status]||muted;
+  const statusColor={generated:'#30C85E',uploaded:'#00C8FF',burned:'#FF8040',error:'#FF4040'}[status]||muted;
 
   return(
     <div style={{display:'flex',gap:10,alignItems:'center',padding:'9px 12px',
@@ -63,9 +63,9 @@ export default function SubtitlesPanel({isDark,video}){
   const[showLangPicker,setShowLangPicker]=useState(false);
   const[search,setSearch]=useState('');
 
-  const text=isDark?'#E8E6FF':'#111122';
+  const text=isDark?'#F0EFFF':'#0C0C0E';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const accent=isDark?'#C8FF00':'#4400CC';
+  const accent='#7C6EFA';
   const bg=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
   const border=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
 
@@ -119,7 +119,7 @@ export default function SubtitlesPanel({isDark,video}){
           </div>
         </div>
         <div style={{display:'flex',gap:8,alignItems:'center'}}>
-          {totalDone>0&&<span style={{fontSize:10,fontWeight:700,color:'#00E676',background:'rgba(0,230,118,0.1)',padding:'2px 8px',borderRadius:99}}>{totalDone} ready</span>}
+          {totalDone>0&&<span style={{fontSize:10,fontWeight:700,color:'#30C85E',background:'rgba(48,200,94,0.1)',padding:'2px 8px',borderRadius:99}}>{totalDone} ready</span>}
           <span style={{fontSize:10,color:muted}}>{open?'▲':'▼'}</span>
         </div>
       </div>
