@@ -42,7 +42,7 @@ function SetupGate({onDone}){
 }
 
 function Inner(){
-  const{theme,channels,settings,modal,setModal}=useApp();
+  const{theme,channels,settings,modal,setModal,activeView,setActiveView}=useApp();
   const isDark=theme==='dark';
   const hasKeys=settings?.apiKeys&&Object.values(settings.apiKeys).some(v=>v);
   const loading=channels===null;
@@ -56,13 +56,9 @@ function Inner(){
   );
 
   // First-run: no AI keys yet → full-screen setup gate
-  if(!hasKeys&&!modal)return(
-    <>
-      <SetupGate onDone={()=>fix(FIX.ADD_ANY_AI)}/>
-      {modal?.type==='system'&&(
-        <SystemSetup initialTab={modal.payload?.tab} initialSubTab={modal.payload?.subTab} onClose={()=>setModal(null)}/>
-      )}
-    </>
+  // But if user navigated to settings already, let them through
+  if(!hasKeys&&activeView!=='settings')return(
+    <SetupGate onDone={()=>setActiveView('settings')}/>
   );
 
   const bg=isDark?'#0C0C0E':'#F0F0F5';
