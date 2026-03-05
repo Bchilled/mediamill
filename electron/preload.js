@@ -31,6 +31,9 @@ contextBridge.exposeInMainWorld('forge',{
   approveIdea:(id)=>ipcRenderer.invoke('ideas:approve',id),
   rejectIdea:(id)=>ipcRenderer.invoke('ideas:reject',id),
   scanIdeas:(channelId)=>ipcRenderer.invoke('ideas:scan',channelId),
+  // Shell / system
+  openExternal:(url)=>ipcRenderer.invoke('shell:openExternal',url),
+  testApiKey:(service,key)=>ipcRenderer.invoke('settings:testKey',service,key),
   // Channel logos
   generateChannelLogos:(name,topic)=>ipcRenderer.invoke('channel:generateLogos',name,topic),
   generateChannelBanner:(name,topic)=>ipcRenderer.invoke('channel:generateBanner',name,topic),

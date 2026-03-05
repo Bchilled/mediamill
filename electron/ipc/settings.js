@@ -60,3 +60,58 @@ module.exports=(ipcMain)=>{
     return flattenSettings(rows);
   };
 };
+
+  // Open URL in system browser (prevents Electron popup windows)
+  const{shell}=require('electron');
+  ipcMain.handle('shell:openExternal',async(_,url)=>{
+    await shell.openExternal(url);
+    return{ok:true};
+  });
+
+  // Test an API key is valid
+  ipcMain.handle('settings:testKey',async(_,service,key)=>{
+    const https=require('https');
+    function req(options,body){
+      return new Promise((resolve,reject)=>{
+        const r=https.request(options,res=>{
+          let d='';res.on('data',c=>d+=c);
+          res.on('end',()=>resolve({status:res.statusCode,body:d}));
+        });
+        r.on('error',reject);
+        if(body)r.write(body);
+        r.end();
+      });
+    }
+    try{
+      if(service==='claude'){
+        const body=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]});
+        const r=await req({hostname:'api.anthropic.com',path:'/v1/messages',method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','Content-Length':Buffer.byteLength(body)}},body);
+        return{ok:r.status===200};
+      }
+      if(service==='gemini'){
+        const r=await req({hostname:'generativelanguage.googleapis.com',path:`/v1beta/models?key=${key}`,method:'GET'},{});
+        return{ok:r.status===200};
+      }
+      if(service==='openai'){
+        const r=await req({hostname:'api.openai.com',path:'/v1/models',method:'GET',
+          headers:{'Authorization':'Bearer '+key}},{});
+        return{ok:r.status===200};
+      }
+      if(service==='pexels'){
+        const r=await req({hostname:'api.pexels.com',path:'/v1/search?query=test&per_page=1',method:'GET',
+          headers:{'Authorization':key}},{});
+        return{ok:r.status===200};
+      }
+      if(service==='pixabay'){
+        const r=await req({hostname:'pixabay.com',path:`/api/?key=${key}&q=test&per_page=3`,method:'GET'},{});
+        return{ok:r.status===200};
+      }
+      if(service==='elevenlabs'){
+        const r=await req({hostname:'api.elevenlabs.io',path:'/v1/user',method:'GET',
+          headers:{'xi-api-key':key}},{});
+        return{ok:r.status===200};
+      }
+      return{ok:false,error:'Unknown service'};
+    }catch(e){return{ok:false,error:e.message};}
+  });
