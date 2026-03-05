@@ -3,7 +3,7 @@ import{useApp}from '../../context/AppContext';
 import{subscribeNotifications}from '../../utils/notifications';
 import NotificationPanel from '../shared/NotificationPanel';
 
-function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActiveView,loadChannels}){
+function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActiveView,loadChannels,onNewChannel}){
   const[open,setOpen]=useState(false);
   const[confirm,setConfirm]=useState(null);
   const ref=useRef();
@@ -133,7 +133,7 @@ function NotifBell({isDark}){
   const muted=isDark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.5)';
   const accent=isDark?'#C8FF00':'#4400CC';
   return(
-    <div ref={ref} style={{position:'relative',flexShrink:0}} WebkitAppRegion="no-drag">
+    <div ref={ref} style={{position:'relative',flexShrink:0}} style={{WebkitAppRegion:"no-drag"}}>
       <button onClick={()=>setOpen(o=>!o)}
         style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
           cursor:'pointer',color:muted,padding:'4px 8px',fontSize:12,position:'relative',transition:'all 0.1s'}}
@@ -174,7 +174,8 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
       </span>
 
       <ChannelDropdown isDark={isDark} channels={channels||[]} activeChannel={activeChannel}
-        setActiveChannel={setActiveChannel} setActiveView={setActiveView} loadChannels={loadChannels}/>
+        setActiveChannel={setActiveChannel} setActiveView={setActiveView} loadChannels={loadChannels}
+        onNewChannel={onNewChannel}/>
 
       <div style={{flex:1}}/>
 
@@ -184,14 +185,14 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
           onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'}
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}>⚙</button>
         <NotifBell isDark={isDark}/>
-        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" WebkitAppRegion="no-drag"
+        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" style={{WebkitAppRegion:"no-drag"}}
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
           onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>
           🔬
         </button>
-        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" WebkitAppRegion="no-drag"
+        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" style={{WebkitAppRegion:"no-drag"}}
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
