@@ -3,7 +3,7 @@ import{useApp}from '../../context/AppContext';
 import{subscribeNotifications}from '../../utils/notifications';
 import NotificationPanel from '../shared/NotificationPanel';
 
-function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActiveView,loadChannels,onNewChannel}){
+function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActiveView,loadChannels,onNewChannel=()=>{}}){
   const[open,setOpen]=useState(false);
   const[confirm,setConfirm]=useState(null);
   const ref=useRef();
@@ -38,7 +38,7 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
   }
 
   return(
-    <div ref={ref} style={{position:'relative',WebkitAppRegion:'no-drag',display:'flex',gap:6}}>
+    <div ref={ref} style={{position:'relative',webkitAppRegion:'no-drag',display:'flex',gap:6}}>
       <button onClick={()=>setOpen(o=>!o)} style={{
         display:'flex',alignItems:'center',gap:8,padding:'5px 12px',
         background:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',
@@ -133,7 +133,7 @@ function NotifBell({isDark}){
   const muted=isDark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.5)';
   const accent=isDark?'#C8FF00':'#4400CC';
   return(
-    <div ref={ref} style={{position:'relative',flexShrink:0}} style={{WebkitAppRegion:"no-drag"}}>
+    <div ref={ref} style={{position:'relative',flexShrink:0}} style={{webkitAppRegion:"no-drag"}}>
       <button onClick={()=>setOpen(o=>!o)}
         style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
           cursor:'pointer',color:muted,padding:'4px 8px',fontSize:12,position:'relative',transition:'all 0.1s'}}
@@ -167,7 +167,7 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
       backdropFilter:'blur(20px)',
       borderBottom:'1px solid '+(isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.09)'),
       borderRadius:'14px 14px 0 0',
-      userSelect:'none',WebkitAppRegion:'drag',
+      userSelect:'none',webkitAppRegion:'drag',
     }}>
       <span style={{fontWeight:900,fontSize:13,letterSpacing:'0.16em',textTransform:'uppercase',color:isDark?'#C8FF00':'#4400CC',textShadow:isDark?'0 0 24px rgba(200,255,0,0.4)':'none',marginRight:6,flexShrink:0}}>
         MediaMill
@@ -179,20 +179,20 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
 
       <div style={{flex:1}}/>
 
-      <div style={{display:'flex',alignItems:'center',gap:6,WebkitAppRegion:'no-drag'}}>
+      <div style={{display:'flex',alignItems:'center',gap:6,webkitAppRegion:'no-drag'}}>
         <button onClick={()=>setActiveView('settings')} title="Settings"
           style={{background:'transparent',border:'none',cursor:'pointer',color:txt,padding:'4px 8px',fontSize:15,borderRadius:7,transition:'all 0.1s'}}
           onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'}
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}>⚙</button>
         <NotifBell isDark={isDark}/>
-        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" style={{WebkitAppRegion:"no-drag"}}
+        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" style={{webkitAppRegion:"no-drag"}}
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
           onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>
           🔬
         </button>
-        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" style={{WebkitAppRegion:"no-drag"}}
+        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" style={{webkitAppRegion:"no-drag"}}
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
