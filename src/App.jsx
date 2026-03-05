@@ -1,6 +1,5 @@
 import React from 'react';
 import TitleBar from './components/layout/TitleBar';
-import Sidebar from './components/layout/Sidebar';
 import MainPanel from './components/layout/MainPanel';
 import{AppProvider,useApp}from './context/AppContext';
 
@@ -15,10 +14,7 @@ function Inner(){
       boxShadow:isDark?'0 32px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.06)':'0 32px 80px rgba(0,0,0,0.2),0 0 0 1px rgba(0,0,0,0.08)',
     }}>
       <TitleBar/>
-      <div style={{display:'grid',gridTemplateColumns:'210px 1fr',flex:1,overflow:'hidden'}}>
-        <Sidebar/>
-        <MainPanel/>
-      </div>
+      <MainPanel/>
     </div>
   );
 }
