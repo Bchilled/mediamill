@@ -1,6 +1,12 @@
 import React,{useState}from 'react';
 import{useApp}from '../../context/AppContext';
-const PRESETS={short:{label:'Shorts',icon:'⚡',desc:'Under 60s',color:'#C8FF00'},mid:{label:'Mid-Form',icon:'📰',desc:'5-20 min',color:'#00C8FF'},long:{label:'Long-Form',icon:'🎬',desc:'20min-3hr',color:'#FF4F00'}};
+
+const PRESETS={
+  short:{label:'Shorts',icon:'⚡',desc:'Under 60 seconds',color:'#C8FF00'},
+  mid:{label:'Mid-Form',icon:'📰',desc:'5 – 20 minutes',color:'#00C8FF'},
+  long:{label:'Long-Form',icon:'🎬',desc:'20 min – 3 hours',color:'#FF4F00'},
+};
+
 export default function NewChannel(){
   const{loadChannels,setActiveView,mode,theme}=useApp();
   const[form,setForm]=useState({name:'',preset:'long',style_prompt:'',auto_approve:false});
@@ -8,65 +14,100 @@ export default function NewChannel(){
   const[error,setError]=useState('');
   const set=(k,v)=>setForm(f=>({...f,[k]:v}));
   const isDark=theme==='dark';
-  const bg=isDark?'#080810':'#F0F0F8';
-  const card=isDark?'#12121F':'#FFFFFF';
-  const border=isDark?'#1A1A2A':'#E0E0EE';
+  const bg=isDark?'#08080F':'#F2F2FC';
+  const card=isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.9)';
+  const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
+  const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)':'0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1)';
   const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'#6B6888':'#888899';
-  const inp=isDark?'#0E0E1A':'#F8F8FF';
+  const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.4)';
+
   async function save(){
-    if(!form.name.trim()){setError('Name required');return;}
+    if(!form.name.trim()){setError('Channel name is required');return;}
     setSaving(true);
     try{await window.forge.createChannel(form);await loadChannels();setActiveView('dashboard');}
     catch(e){setError(e.message);}
     finally{setSaving(false);}
   }
+
   return(
     <div className="flex-1 overflow-y-auto p-8" style={{background:bg}}>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-black mb-1" style={{color:text}}>Create Channel</h2>
-        <p className="text-xs mb-8" style={{color:muted}}>Each channel is a separate YouTube presence.</p>
-        {error&&<div className="p-3 mb-4 text-xs text-[#FF1744] border border-[rgba(255,23,68,0.3)]">{error}</div>}
-        <div className="mb-6">
-          <label className="text-[9px] font-bold tracking-widest uppercase block mb-2" style={{color:muted}}>Channel Name</label>
-          <input value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. True North Daily"
-            className="w-full px-3 py-2.5 text-sm outline-none" style={{background:inp,border:'1px solid '+border,color:text}}/>
-        </div>
-        <div className="mb-6">
-          <label className="text-[9px] font-bold tracking-widest uppercase block mb-2" style={{color:muted}}>Preset</label>
-          <div className="grid grid-cols-3 gap-3">
-            {Object.entries(PRESETS).map(([key,p])=>(
-              <div key={key} onClick={()=>set('preset',key)} className="p-4 cursor-pointer text-center transition-all"
-                style={{background:form.preset===key?card:isDark?'#12121F':'#F8F8FF',border:form.preset===key?'1px solid '+p.color:'1px solid '+border}}>
-                <div className="text-2xl mb-2">{p.icon}</div>
-                <div className="font-bold text-sm mb-1" style={{color:form.preset===key?p.color:text}}>{p.label}</div>
-                <div className="text-[10px]" style={{color:muted}}>{p.desc}</div>
-              </div>
-            ))}
+      <div className="max-w-xl mx-auto">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={()=>setActiveView('dashboard')} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{padding:'6px 10px'}}>← Back</button>
+          <div>
+            <h2 className="text-xl font-black" style={{color:text}}>Create Channel</h2>
+            <p className="text-[11px]" style={{color:muted}}>Each channel links to a separate YouTube account</p>
           </div>
         </div>
-        {mode==='advanced'&&(
-          <div className="mb-6">
-            <label className="text-[9px] font-bold tracking-widest uppercase block mb-2" style={{color:muted}}>Style Prompt</label>
-            <textarea value={form.style_prompt} onChange={e=>set('style_prompt',e.target.value)}
-              placeholder="Describe the tone and style..." rows={3}
-              className="w-full px-3 py-2.5 text-sm outline-none resize-none" style={{background:inp,border:'1px solid '+border,color:text}}/>
+
+        {error&&(
+          <div className="mb-4 px-4 py-3 text-sm rounded-xl" style={{background:'rgba(255,23,68,0.08)',border:'1px solid rgba(255,23,68,0.2)',color:'#FF1744'}}>
+            {error}
           </div>
         )}
-        <div className="mb-8 flex items-center justify-between p-4" style={{background:card,border:'1px solid '+border}}>
-          <div>
-            <div className="font-bold text-sm mb-0.5" style={{color:text}}>Auto-approve videos</div>
-            <div className="text-[10px]" style={{color:muted}}>Skip review. You lose creative control.</div>
-          </div>
-          <div onClick={()=>set('auto_approve',!form.auto_approve)} className="w-10 h-6 rounded-full cursor-pointer relative transition-all flex-shrink-0"
-            style={{background:form.auto_approve?'rgba(200,255,0,0.2)':'#1E1E30',border:form.auto_approve?'1px solid #C8FF00':'1px solid #252538'}}>
-            <div className="absolute top-1 w-4 h-4 rounded-full transition-all" style={{left:form.auto_approve?'20px':'3px',background:form.auto_approve?'#C8FF00':'#2E2E48'}}/>
+
+        {/* Name */}
+        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px 24px',marginBottom:16}}>
+          <label className="text-[9px] font-bold tracking-[3px] uppercase block mb-2" style={{color:muted}}>Channel Name</label>
+          <input value={form.name} onChange={e=>set('name',e.target.value)}
+            placeholder="e.g. Due North News"
+            className={isDark?'input-dark':'input-light'} style={{width:'100%'}}/>
+        </div>
+
+        {/* Preset */}
+        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px 24px',marginBottom:16}}>
+          <label className="text-[9px] font-bold tracking-[3px] uppercase block mb-3" style={{color:muted}}>Content Format</label>
+          <div className="grid grid-cols-3 gap-3">
+            {Object.entries(PRESETS).map(([key,p])=>{
+              const isSelected=form.preset===key;
+              return(
+                <div key={key} onClick={()=>set('preset',key)}
+                  className="p-4 text-center cursor-pointer transition-all rounded-xl"
+                  style={{
+                    background:isSelected?p.color+'12':'transparent',
+                    border:'1px solid '+(isSelected?p.color+'40':cardBorder),
+                    boxShadow:isSelected?'0 0 16px '+p.color+'20':'none',
+                  }}>
+                  <div className="text-2xl mb-2">{p.icon}</div>
+                  <div className="font-bold text-sm mb-0.5" style={{color:isSelected?p.color:text}}>{p.label}</div>
+                  <div className="text-[10px]" style={{color:muted}}>{p.desc}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
+
+        {/* Style prompt (advanced) */}
+        {mode==='advanced'&&(
+          <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px 24px',marginBottom:16}}>
+            <label className="text-[9px] font-bold tracking-[3px] uppercase block mb-2" style={{color:muted}}>Style Prompt</label>
+            <textarea value={form.style_prompt} onChange={e=>set('style_prompt',e.target.value)}
+              placeholder="Describe tone, style, target audience..."
+              rows={3} className={isDark?'input-dark':'input-light'} style={{width:'100%',resize:'none'}}/>
+          </div>
+        )}
+
+        {/* Auto-approve */}
+        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'16px 24px',marginBottom:24}}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold text-sm mb-0.5" style={{color:text}}>Auto-approve videos</div>
+              <div className="text-[11px]" style={{color:muted}}>Skip manual review — you lose creative control</div>
+            </div>
+            <div onClick={()=>set('auto_approve',!form.auto_approve)}
+              className="toggle"
+              style={{background:form.auto_approve?'rgba(200,255,0,0.15)':'rgba(255,255,255,0.06)',border:'1px solid '+(form.auto_approve?'rgba(200,255,0,0.3)':'rgba(255,255,255,0.1)')}}>
+              <div className="toggle-thumb"
+                style={{left:form.auto_approve?20:3,background:form.auto_approve?'#C8FF00':'rgba(255,255,255,0.3)'}}/>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
         <div className="flex gap-3">
-          <button onClick={()=>setActiveView('dashboard')} className="px-4 py-2.5 text-xs font-bold border" style={{borderColor:border,color:muted}}>Cancel</button>
-          <button onClick={save} disabled={saving} className="flex-1 py-2.5 text-xs font-bold bg-[#C8FF00] text-black disabled:opacity-50">
-            {saving?'Creating...':'Create Channel →'}
+          <button onClick={()=>setActiveView('dashboard')} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{padding:'10px 20px'}}>Cancel</button>
+          <button onClick={save} disabled={saving} className="btn btn-primary" style={{flex:1,padding:'10px 20px',opacity:saving?0.6:1}}>
+            {saving?'Creating…':'Create Channel →'}
           </button>
         </div>
       </div>

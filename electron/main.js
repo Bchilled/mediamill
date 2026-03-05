@@ -3,8 +3,22 @@ const path=require('path');
 const isDev=!app.isPackaged;
 let win;
 function createWindow(){
-  win=new BrowserWindow({width:1440,height:900,minWidth:1100,minHeight:700,frame:false,backgroundColor:'#080810',
-    webPreferences:{preload:path.join(__dirname,'preload.js'),nodeIntegration:false,contextIsolation:true},show:false});
+  win=new BrowserWindow({
+    width:1440,height:900,minWidth:1100,minHeight:700,
+    frame:false,
+    transparent:true,
+    backgroundColor:'#00000000',
+    vibrancy:'under-window',
+    visualEffectState:'active',
+    roundedCorners:true,
+    titleBarStyle:'hidden',
+    webPreferences:{
+      preload:path.join(__dirname,'preload.js'),
+      nodeIntegration:false,
+      contextIsolation:true,
+    },
+    show:false,
+  });
   isDev?win.loadURL('http://localhost:5173'):win.loadFile(path.join(__dirname,'../dist/index.html'));
   win.once('ready-to-show',()=>win.show());
 }

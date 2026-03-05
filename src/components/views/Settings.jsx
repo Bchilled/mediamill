@@ -1,68 +1,103 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
+
 const FIELDS=[
-  {key:'claude',label:'Claude (Anthropic)',placeholder:'sk-ant-...',link:'https://console.anthropic.com',desc:'Script writing, SEO, analytics'},
-  {key:'gemini',label:'Google Gemini',placeholder:'AIza...',link:'https://aistudio.google.com/app/apikey',desc:'Ingest, assets, validation'},
-  {key:'openai',label:'OpenAI (optional)',placeholder:'sk-...',link:'https://platform.openai.com/api-keys',desc:'Fallback model'},
-  {key:'pexels',label:'Pexels',placeholder:'...',link:'https://www.pexels.com/api/',desc:'Free stock images and video'},
-  {key:'pixabay',label:'Pixabay (optional)',placeholder:'...',link:'https://pixabay.com/api/docs/',desc:'Additional free assets'},
-  {key:'youtube',label:'YouTube Data API',placeholder:'AIza...',link:'https://console.cloud.google.com',desc:'Upload and analytics — per-channel OAuth configured in channel settings'},
+  {key:'claude',label:'Claude',co:'Anthropic',placeholder:'sk-ant-...',link:'https://console.anthropic.com',desc:'Scripts, SEO, analytics',icon:'🧠'},
+  {key:'gemini',label:'Gemini',co:'Google',placeholder:'AIza...',link:'https://aistudio.google.com/app/apikey',desc:'Ingest, assets, validation',icon:'✨'},
+  {key:'openai',label:'OpenAI',co:'Optional fallback',placeholder:'sk-...',link:'https://platform.openai.com/api-keys',desc:'Backup model',icon:'⚡'},
+  {key:'pexels',label:'Pexels',co:'Stock media',placeholder:'paste key...',link:'https://www.pexels.com/api/',desc:'Free images & video',icon:'📷'},
+  {key:'pixabay',label:'Pixabay',co:'Optional',placeholder:'paste key...',link:'https://pixabay.com/api/docs/',desc:'Additional free assets',icon:'🖼'},
+  {key:'youtube',label:'YouTube Data API',co:'Google Cloud',placeholder:'AIza...',link:'https://console.cloud.google.com',desc:'Upload & analytics — OAuth per channel',icon:'▶️'},
 ];
+
 export default function Settings(){
   const{theme}=useApp();
   const isDark=theme==='dark';
   const[keys,setKeys]=useState({});
+  const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[saved,setSaved]=useState(false);
-  useEffect(()=>{window.forge.getSettings().then(s=>setKeys(s.apiKeys||{})).catch(()=>{});},[]);
-  async function save(){await window.forge.updateSettings({apiKeys:keys});setSaved(true);setTimeout(()=>setSaved(false),2000);}
-  const bg=isDark?'#080810':'#F8F8FF';
-  const card=isDark?'#12121F':'#FFFFFF';
-  const border=isDark?'#1A1A2A':'#E0E0EE';
+  const[show,setShow]=useState({});
+
+  useEffect(()=>{window.forge.getSettings().then(s=>{setKeys(s.apiKeys||{});if(s.budget)setBudget(s.budget);}).catch(()=>{});},[ ]);
+
+  async function save(){
+    await window.forge.updateSettings({apiKeys:keys,budget});
+    setSaved(true);setTimeout(()=>setSaved(false),2000);
+  }
+
+  const bg=isDark?'#08080F':'#F2F2FC';
+  const card=isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.9)';
+  const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
+  const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)':'0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1)';
+  const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)';
   const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'#6B6888':'#888899';
-  const inp=isDark?'#0E0E1A':'#F0F0F8';
-  return(<div className='flex-1 overflow-y-auto p-8' style={{background:bg}}>
-    <h2 className='text-2xl font-black mb-1' style={{color:text}}>Settings</h2>
-    <p className='text-xs mb-8' style={{color:muted}}>Configure AI services to power MediaMill. Keys are stored locally on your machine.</p>
-    <div className='text-[9px] font-bold tracking-[3px] uppercase mb-4' style={{color:muted}}>AI and API Keys</div>
-    <div className='space-y-3 mb-8'>
-      {FIELDS.map(f=>(
-        <div key={f.key} className='p-4' style={{background:card,border:'1px solid '+border}}>
-          <div className='flex items-start justify-between mb-2'>
-            <div>
-              <div className='font-bold text-sm' style={{color:text}}>{f.label}</div>
-              <div className='text-[10px]' style={{color:muted}}>{f.desc}</div>
+  const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.4)';
+
+  return(
+    <div className="flex-1 overflow-y-auto p-8" style={{background:bg}}>
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-xl font-black mb-1" style={{color:text}}>Settings</h2>
+        <p className="text-[11px] mb-8" style={{color:muted}}>API keys are stored locally on your machine and never sent to any server.</p>
+
+        {/* API Keys */}
+        <div className="text-[9px] font-bold tracking-[3px] uppercase mb-3" style={{color:muted}}>AI & API Keys</div>
+        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,overflow:'hidden',marginBottom:24}}>
+          {FIELDS.map((f,i)=>(
+            <div key={f.key} style={{borderBottom:i<FIELDS.length-1?'1px solid '+rowBorder:'none',padding:'16px 20px'}}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-lg">{f.icon}</span>
+                  <div>
+                    <div className="font-semibold text-sm" style={{color:text}}>{f.label}</div>
+                    <div className="text-[10px]" style={{color:muted}}>{f.co} · {f.desc}</div>
+                  </div>
+                </div>
+                <a href={f.link} target="_blank" rel="noreferrer"
+                  className="btn" style={{background:'rgba(200,255,0,0.06)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',padding:'4px 10px',fontSize:10,textDecoration:'none'}}>
+                  Get Key ↗
+                </a>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type={show[f.key]?'text':'password'}
+                  value={keys[f.key]||''}
+                  onChange={e=>setKeys(k=>({...k,[f.key]:e.target.value}))}
+                  placeholder={f.placeholder}
+                  className={isDark?'input-dark':'input-light'}
+                  style={{flex:1,fontFamily:'JetBrains Mono, monospace',fontSize:12}}/>
+                <button onClick={()=>setShow(s=>({...s,[f.key]:!s[f.key]}))}
+                  className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{padding:'8px 12px',fontSize:12}}>
+                  {show[f.key]?'Hide':'Show'}
+                </button>
+              </div>
             </div>
-            <a href={f.link} target='_blank' rel='noreferrer'
-              className='text-[10px] font-bold px-2 py-1 border'
-              style={{color:'#C8FF00',borderColor:'rgba(200,255,0,0.3)',background:'rgba(200,255,0,0.06)'}}>
-              Get Key
-            </a>
-          </div>
-          <input type='password' value={keys[f.key]||''} onChange={e=>setKeys(k=>({...k,[f.key]:e.target.value}))}
-            placeholder={f.placeholder} className='w-full px-3 py-2 text-xs outline-none font-mono'
-            style={{background:inp,border:'1px solid '+border,color:text}}/>
+          ))}
         </div>
-      ))}
-    </div>
-    <div className='flex items-center gap-3'>
-      <button onClick={save} className='px-6 py-2.5 text-xs font-bold bg-[#C8FF00] text-black'>Save Keys</button>
-      {saved&&<span className='text-xs font-bold' style={{color:'#00E676'}}>Saved.</span>}
-    </div>
-    <div className='mt-10 pt-6' style={{borderTop:'1px solid '+border}}>
-      <div className='text-[9px] font-bold tracking-[3px] uppercase mb-4' style={{color:muted}}>Budget Limits</div>
-      <div className='grid grid-cols-3 gap-3'>
-        {[{label:'Daily',def:5},{label:'Weekly',def:20},{label:'Monthly',def:80}].map(b=>(
-          <div key={b.label} className='p-4' style={{background:card,border:'1px solid '+border}}>
-            <div className='text-[9px] font-bold tracking-widest uppercase mb-2' style={{color:muted}}>{b.label}</div>
-            <div className='flex items-center gap-1'>
-              <span className='text-sm' style={{color:muted}}>$</span>
-              <input type='number' defaultValue={b.def} className='w-full px-2 py-1 text-sm outline-none font-mono'
-                style={{background:inp,border:'1px solid '+border,color:text}}/>
-            </div>
+
+        {/* Budget */}
+        <div className="text-[9px] font-bold tracking-[3px] uppercase mb-3" style={{color:muted}}>Spend Limits</div>
+        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px',marginBottom:24}}>
+          <div className="grid grid-cols-3 gap-4">
+            {[{label:'Daily',key:'daily'},{label:'Weekly',key:'weekly'},{label:'Monthly',key:'monthly'}].map(b=>(
+              <div key={b.key}>
+                <div className="text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:muted}}>{b.label}</div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-semibold" style={{color:muted}}>$</span>
+                  <input type="number" value={budget[b.key]}
+                    onChange={e=>setBudget(bv=>({...bv,[b.key]:parseFloat(e.target.value)||0}))}
+                    className={isDark?'input-dark':'input-light'} style={{width:'100%',fontFamily:'JetBrains Mono, monospace'}}/>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Save */}
+        <div className="flex items-center gap-3">
+          <button onClick={save} className="btn btn-primary" style={{padding:'10px 24px'}}>Save Settings</button>
+          {saved&&<span className="text-sm font-semibold" style={{color:'#00E676'}}>✓ Saved</span>}
+        </div>
       </div>
     </div>
-  </div>);
+  );
 }
