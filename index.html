@@ -1,1 +1,27 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>FORGE</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>MediaMill</title>
+  <style>
+    body{margin:0;background:#0D0D1A;color:#E8E6FF;font-family:monospace;}
+    #boot-status{position:fixed;bottom:8px;left:8px;font-size:10px;color:rgba(255,255,255,0.3);z-index:99999;}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="boot-status">⟳ Starting MediaMill...</div>
+  <script>
+    window.__bootStart = Date.now();
+    window.onerror = function(msg,src,line,col,err){
+      document.getElementById('root').innerHTML =
+        '<div style="color:#EE2244;padding:40px;font-family:monospace;font-size:13px;">' +
+        '<div style="color:#C8FF00;font-size:16px;margin-bottom:12px">⚠ Startup Error</div>' +
+        '<pre style="white-space:pre-wrap">' + (err&&err.stack||msg) + '</pre>' +
+        '<div style="color:#888;margin-top:8px;font-size:10px">src: '+src+':'+line+'</div></div>';
+    };
+  </script>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
