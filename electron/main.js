@@ -1,4 +1,7 @@
 const{app,BrowserWindow,ipcMain}=require('electron');
+app.commandLine.appendSwitch('enable-webgl');
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
 const path=require('path');
 const isDev=!app.isPackaged;
 let win;
@@ -13,7 +16,7 @@ function createWindow(){
     titleBarStyle:'hidden',
     webPreferences:{
       preload:path.join(__dirname,'preload.js'),
-      nodeIntegration:false,contextIsolation:true,
+      nodeIntegration:false,contextIsolation:true,webgl:true,
     },
     show:false,
   });
