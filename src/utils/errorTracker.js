@@ -2,6 +2,7 @@ import{suggestFix}from './fixRouter';
 
 let errors=[];
 let listeners=[];
+let _persisting=false; // prevent re-entrant IPC calls
 
 function notify(){listeners.forEach(fn=>fn([...errors]));}
 
@@ -12,12 +13,16 @@ export function subscribeErrors(fn){
 }
 
 export function logError(source,message,detail='',stack=''){
-  const suggestion=suggestFix(source,message);
+  // Never log errors about logging — breaks the loop
+  const msg=String(message||'');
+  if(msg.includes('log:error')||msg.includes('No handler registered for')||msg.includes('logError'))return;
+
+  const suggestion=suggestFix(source,msg);
   const entry={
     id:Date.now()+Math.random(),
     timestamp:new Date().toISOString(),
     source,
-    message:String(message),
+    message:msg,
     detail:String(detail||''),
     stack:String(stack||''),
     resolved:false,
@@ -26,7 +31,13 @@ export function logError(source,message,detail='',stack=''){
   };
   errors=[entry,...errors].slice(0,200);
   notify();
-  try{window.forge.logError(entry);}catch(e){}
+
+  // Persist to main — guarded against re-entrance
+  if(!_persisting){
+    _persisting=true;
+    try{window.forge.logError(entry);}catch(e){}
+    _persisting=false;
+  }
 }
 
 export function resolveError(id){
@@ -34,10 +45,7 @@ export function resolveError(id){
   notify();
 }
 
-export function clearErrors(){
-  errors=[];
-  notify();
-}
+export function clearErrors(){errors=[];notify();}
 
 export function installGlobalErrorHandlers(){
   window.onerror=(msg,src,line,col,err)=>{
@@ -45,13 +53,23 @@ export function installGlobalErrorHandlers(){
     return false;
   };
   window.onunhandledrejection=e=>{
-    logError('promise',e.reason?.message||String(e.reason),'Unhandled promise rejection',e.reason?.stack||'');
+    const msg=e.reason?.message||String(e.reason||'');
+    // Skip IPC-related promise rejections — they self-resolve
+    if(msg.includes('No handler')||msg.includes('log:error'))return;
+    logError('promise',msg,'Unhandled promise rejection',e.reason?.stack||'');
   };
   const origError=console.error.bind(console);
   console.error=(...args)=>{
     origError(...args);
     const msg=args.map(a=>typeof a==='object'?JSON.stringify(a):String(a)).join(' ');
-    if(msg.includes('[vite]')||msg.includes('ResizeObserver'))return;
+    // Skip known noise — Vite HMR, ResizeObserver, IPC handler errors
+    if(
+      msg.includes('[vite]')||
+      msg.includes('ResizeObserver')||
+      msg.includes('No handler registered')||
+      msg.includes('log:error')||
+      msg.includes('ipcRenderer')
+    )return;
     logError('console',msg.slice(0,200));
   };
 }
