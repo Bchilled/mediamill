@@ -110,23 +110,10 @@ function SunBody({ aiKey, position, onClick, isSelected, pulseOffset = 0 }) {
 
       {/* Label */}
       <Billboard follow lockX={false} lockY={false} lockZ={false}>
-        <Text
-          position={[0, -1.8, 0]}
-          fontSize={0.22}
-          color="#EEEEFF"
-          anchorX="center"
-          anchorY="middle"
-          font="https://fonts.gstatic.com/s/dmsans/v11/rP2Hp2ywxg089UriCZa4ET-D.woff"
-        >
+        <Text position={[0, -1.8, 0]} fontSize={0.22} color="#EEEEFF" anchorX="center" anchorY="middle">
           {colors.label}
         </Text>
-        <Text
-          position={[0, -2.1, 0]}
-          fontSize={0.14}
-          color="#7C6EFA"
-          anchorX="center"
-          anchorY="middle"
-        >
+        <Text position={[0, -2.1, 0]} fontSize={0.14} color="#7C6EFA" anchorX="center" anchorY="middle">
           {colors.company}
         </Text>
       </Billboard>
