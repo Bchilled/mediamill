@@ -155,9 +155,6 @@ module.exports=(ipcMain)=>{
 
     // FFmpeg
     const{execSync}=require('child_process');
-    const{app}=require('electron');
-    const path=require('path');
-    const fs=require('fs');
     try{
       const ffmpegPath=path.join(app.getPath('userData'),'ffmpeg.exe');
       const candidates=[ffmpegPath,'ffmpeg'];
@@ -177,9 +174,6 @@ module.exports=(ipcMain)=>{
   });
 
   // Open folder/file picker dialog
-  const{dialog,app}=require('electron');
-  const path=require('path');
-  const fs=require('fs');
 
   ipcMain.handle('dialog:openFolder',async(_,acceptType)=>{
     const filters=[];
@@ -237,9 +231,6 @@ module.exports=(ipcMain)=>{
   });
 
   // Error logging
-  const fs=require('fs');
-  const path=require('path');
-  const{app}=require('electron');
   const errorLogPath=path.join(app.getPath('userData'),'error-log.jsonl');
 
   ipcMain.handle('log:error',async(_,entry)=>{
@@ -248,7 +239,6 @@ module.exports=(ipcMain)=>{
   });
 
   ipcMain.handle('log:save',async(_,text)=>{
-    const{dialog}=require('electron');
     const{filePath,canceled}=await dialog.showSaveDialog({
       defaultPath:'mediamill-errors.txt',
       filters:[{name:'Text',extensions:['txt']},{name:'All',extensions:['*']}],
