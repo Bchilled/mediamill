@@ -59,6 +59,10 @@ app.whenReady().then(async()=>{
   await ensureFFmpeg();
   await require('./startup')();
   createWindow();
+  // Shell openExternal — registered first to avoid loop
+  const{shell}=require('electron');
+  ipcMain.removeHandler('shell:openExternal');
+  ipcMain.handle('shell:openExternal',async(_,url)=>{await shell.openExternal(url);return{ok:true};});
   require('./ipc/window')(ipcMain,win);
   require('./ipc/db')(ipcMain);
   require('./ipc/channels')(ipcMain);

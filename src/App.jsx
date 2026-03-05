@@ -13,11 +13,12 @@ function Inner(){
   const[firstRun,setFirstRun]=useState(null);// null=loading
 
   useEffect(()=>{
-    // Show first-run if no channels exist
-    if(channels!==null){
-      const hasKeys=settings?.apiKeys?.claude||settings?.apiKeys?.gemini;
-      setFirstRun(channels.length===0);
-    }
+    // Wait for both channels AND settings to load before deciding
+    if(channels===null)return;
+    const hasKeys=settings?.apiKeys&&Object.values(settings.apiKeys).some(v=>v);
+    const hasChannels=channels.length>0;
+    // Show wizard only if no keys AND no channels
+    setFirstRun(!hasKeys&&!hasChannels);
   },[channels,settings]);
 
   if(firstRun===null)return null;// Loading

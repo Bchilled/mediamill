@@ -62,12 +62,6 @@ module.exports=(ipcMain)=>{
 };
 
   // Open URL in system browser (prevents Electron popup windows)
-  const{shell}=require('electron');
-  ipcMain.handle('shell:openExternal',async(_,url)=>{
-    await shell.openExternal(url);
-    return{ok:true};
-  });
-
   // Test an API key is valid
   ipcMain.handle('settings:testKey',async(_,service,key)=>{
     const https=require('https');
@@ -95,6 +89,16 @@ module.exports=(ipcMain)=>{
       }
       if(service==='openai'){
         const r=await req({hostname:'api.openai.com',path:'/v1/models',method:'GET',
+          headers:{'Authorization':'Bearer '+key}},{});
+        return{ok:r.status===200};
+      }
+      if(service==='grok'){
+        const r=await req({hostname:'api.x.ai',path:'/v1/models',method:'GET',
+          headers:{'Authorization':'Bearer '+key}},{});
+        return{ok:r.status===200};
+      }
+      if(service==='mistral'){
+        const r=await req({hostname:'api.mistral.ai',path:'/v1/models',method:'GET',
           headers:{'Authorization':'Bearer '+key}},{});
         return{ok:r.status===200};
       }

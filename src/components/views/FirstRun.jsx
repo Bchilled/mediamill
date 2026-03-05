@@ -296,86 +296,108 @@ export default function FirstRun({onComplete}){
       </Screen>
     ),
 
-    need_ai:()=>(
-      <Screen isDark={isDark} title="First — connect an AI" subtitle="MediaMill needs AI to write scripts and find content. Claude is best. Gemini is free."
-        back={()=>go('welcome')}>
-        <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          {[
-            {id:'claude',label:'Claude',sub:'Anthropic · Best quality · ~$0.01/script',badge:'Recommended',color:'#C8FF00',url:'https://console.anthropic.com'},
-            {id:'gemini',label:'Gemini',sub:'Google · Free tier available · Good fallback',badge:'Free tier',color:'#00C8FF',url:'https://aistudio.google.com/app/apikey'},
-          ].map(p=>(
-            <div key={p.id} onClick={()=>go('add_'+p.id)}
-              style={{padding:'16px 18px',borderRadius:14,border:'2px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)'),
-                cursor:'pointer',background:card,transition:'all 0.15s',display:'flex',alignItems:'center',gap:14}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=p.color+'60';e.currentTarget.style.background=p.color+'08';}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.1)';e.currentTarget.style.background=card;}}>
-              <div style={{flex:1}}>
-                <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:3}}>
-                  <span style={{fontSize:14,fontWeight:800,color:text}}>{p.label}</span>
-                  <span style={{fontSize:9,fontWeight:700,padding:'1px 7px',borderRadius:99,background:p.color+'18',color:p.color,border:'1px solid '+p.color+'30'}}>{p.badge}</span>
-                  {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#00E676'}}>✓ Connected</span>}
+    need_ai:()=>{
+      const AI_PROVIDERS=[
+        {id:'claude',  label:'Claude',   sub:'Best quality · ~$0.01/script · Ideal for Canadian content',badge:'Recommended',color:'#C8FF00'},
+        {id:'gemini',  label:'Gemini',   sub:'Google · Free tier · Fast research and B-roll matching',badge:'Free tier',color:'#00C8FF'},
+        {id:'openai',  label:'OpenAI',   sub:'GPT-4o · Strong fallback · Great for SEO titles',badge:'Optional',color:'#888'},
+        {id:'grok',    label:'Grok',     sub:'xAI · Real-time web access · Good for breaking news',badge:'Optional',color:'#FF8040'},
+        {id:'mistral', label:'Mistral',  sub:'European AI · Privacy-focused · Budget friendly',badge:'Optional',color:'#A060FF'},
+      ];
+      const connected=AI_PROVIDERS.filter(p=>testResults[p.id]==='ok');
+      return(
+        <Screen isDark={isDark} title="Connect AI Models"
+          subtitle="MediaMill uses AI to write scripts, find content, and optimize for YouTube. Add as many as you like — it assigns each task to the best model automatically."
+          back={()=>go('welcome')}
+          skip={()=>go('media_intro')}>
+          <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:10}}>
+            {AI_PROVIDERS.map(p=>(
+              <div key={p.id} onClick={()=>go('add_ai_'+p.id)}
+                style={{padding:'12px 15px',borderRadius:12,
+                  border:'2px solid '+(testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'),
+                  cursor:'pointer',background:testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card,transition:'all 0.12s',display:'flex',alignItems:'center',gap:12}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=p.color+'50';e.currentTarget.style.background=p.color+'07';}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=testResults[p.id]==='ok'?'rgba(0,230,118,0.4)':isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';e.currentTarget.style.background=testResults[p.id]==='ok'?'rgba(0,230,118,0.04)':card;}}>
+                <div style={{flex:1}}>
+                  <div style={{display:'flex',gap:7,alignItems:'center',marginBottom:2}}>
+                    <span style={{fontSize:13,fontWeight:800,color:text}}>{p.label}</span>
+                    <span style={{fontSize:9,fontWeight:700,padding:'1px 6px',borderRadius:99,background:p.color+'15',color:p.color,border:'1px solid '+p.color+'25'}}>{p.badge}</span>
+                    {testResults[p.id]==='ok'&&<span style={{fontSize:10,fontWeight:700,color:'#00E676'}}>✓ Connected</span>}
+                  </div>
+                  <div style={{fontSize:11,color:muted}}>{p.sub}</div>
                 </div>
-                <div style={{fontSize:11,color:muted}}>{p.sub}</div>
+                <span style={{fontSize:14,color:testResults[p.id]==='ok'?'#00E676':muted}}>{testResults[p.id]==='ok'?'✓':'→'}</span>
               </div>
-              <span style={{fontSize:18,color:muted}}>→</span>
-            </div>
-          ))}
-          <div style={{textAlign:'center',paddingTop:4}}>
-            <div style={{fontSize:11,color:sub,marginBottom:8}}>You only need one. You can add both later.</div>
-            {(testResults.claude==='ok'||testResults.gemini==='ok')&&(
-              <button onClick={()=>saveKeysAndGo('media_intro')} className="btn btn-primary" style={{fontSize:12,padding:'10px 28px'}}>
-                Continue with connected AI →
-              </button>
-            )}
+            ))}
           </div>
-        </div>
-      </Screen>
-    ),
+          <div style={{background:isDark?'rgba(200,255,0,0.04)':'rgba(68,0,204,0.03)',border:'1px solid '+(isDark?'rgba(200,255,0,0.1)':'rgba(68,0,204,0.08)'),borderRadius:10,padding:'9px 12px',marginBottom:10,fontSize:11,color:muted,lineHeight:1.5}}>
+            💡 More models = more resilience. MediaMill auto-assigns each task to the fastest, cheapest, and most capable model available. You only need one to start.
+          </div>
+          {connected.length>0&&(
+            <button onClick={()=>saveKeysAndGo('media_intro')} className="btn btn-primary" style={{width:'100%',padding:'12px',fontSize:13}}>
+              Continue with {connected.length} model{connected.length!==1?'s':''} connected →
+            </button>
+          )}
+        </Screen>
+      );
+    },
 
-    add_claude:()=>(
-      <Screen isDark={isDark} title="Connect Claude" subtitle="Anthropic's API — best quality for writing scripts and SEO."
-        back={()=>go('need_ai')}
-        next={testResults.claude==='ok'?()=>saveKeysAndGo('need_ai'):null}
-        nextLabel="Save & Continue →"
-        skip={()=>go('need_ai')}>
-        <Steps isDark={isDark} items={[
+    ...Object.fromEntries(['claude','gemini','openai','grok','mistral'].map(id=>{
+      const INFO={
+        claude:{title:'Connect Claude',sub:"Anthropic — best quality for scripts and SEO.",ph:'sk-ant-api03-...',url:'https://console.anthropic.com',steps:[
           {text:'Open Anthropic Console',url:'https://console.anthropic.com'},
           {text:'Left sidebar →',highlight:'API Keys'},
-          {text:'Click — name it MediaMill',highlight:'+ Create Key'},
-          'Copy the key (starts with sk-ant-)',
+          {text:'Click',highlight:'+ Create Key'},
+          'Name it MediaMill, click Create',
+          'Copy the key starting with sk-ant-',
           'Paste below and click Test',
-        ]}/>
-        <KeyInput isDark={isDark} placeholder="sk-ant-api03-..." value={keys.claude} onChange={v=>setK('claude',v)}
-          onTest={()=>testKey('claude',keys.claude)} testResult={testResults.claude} testing={testing.claude}/>
-        {testResults.claude==='ok'&&(
-          <button onClick={()=>saveKeysAndGo('need_ai')} className="btn btn-primary" style={{width:'100%',padding:'12px',marginTop:12,fontSize:13}}>
-            ✓ Claude connected — Continue →
-          </button>
-        )}
-      </Screen>
-    ),
-
-    add_gemini:()=>(
-      <Screen isDark={isDark} title="Connect Gemini" subtitle="Google's free AI — good for research and as a fallback."
-        back={()=>go('need_ai')}
-        skip={()=>go('need_ai')}>
-        <Steps isDark={isDark} items={[
+        ]},
+        gemini:{title:'Connect Gemini',sub:"Google AI Studio — free tier, great for research.",ph:'AIzaSy...',url:'https://aistudio.google.com/app/apikey',steps:[
           {text:'Open Google AI Studio',url:'https://aistudio.google.com/app/apikey'},
           {text:'Click',highlight:'+ Create API key'},
-          'In the dropdown, choose any existing project',
-          'Copy the key (starts with AIzaSy)',
+          'Choose any existing Google project from the dropdown',
+          'Copy the key starting with AIzaSy',
           'Paste below and click Test',
-        ]}/>
-        <KeyInput isDark={isDark} placeholder="AIzaSy..." value={keys.gemini} onChange={v=>setK('gemini',v)}
-          onTest={()=>testKey('gemini',keys.gemini)} testResult={testResults.gemini} testing={testing.gemini}/>
-        {testResults.gemini==='ok'&&(
-          <button onClick={()=>saveKeysAndGo('need_ai')} className="btn btn-primary" style={{width:'100%',padding:'12px',marginTop:12,fontSize:13}}>
-            ✓ Gemini connected — Continue →
-          </button>
-        )}
-      </Screen>
-    ),
-
+        ]},
+        openai:{title:'Connect OpenAI',sub:"GPT-4o — strong fallback and great for SEO.",ph:'sk-proj-...',url:'https://platform.openai.com/api-keys',steps:[
+          {text:'Open OpenAI Platform',url:'https://platform.openai.com/api-keys'},
+          {text:'Click',highlight:'+ Create new secret key'},
+          'Name it MediaMill',
+          'Copy the key starting with sk-',
+          'Paste below and click Test',
+        ]},
+        grok:{title:'Connect Grok',sub:"xAI — real-time web, good for breaking news.",ph:'xai-...',url:'https://console.x.ai',steps:[
+          {text:'Open xAI Console',url:'https://console.x.ai'},
+          'Sign in with your X account',
+          {text:'Go to',highlight:'API Keys'},
+          'Create a key and copy it',
+          'Paste below and click Test',
+        ]},
+        mistral:{title:'Connect Mistral',sub:"European AI — privacy-focused and budget friendly.",ph:'...',url:'https://console.mistral.ai',steps:[
+          {text:'Open Mistral Console',url:'https://console.mistral.ai'},
+          {text:'Go to',highlight:'API Keys'},
+          'Create a new key and copy it',
+          'Paste below and click Test',
+        ]},
+      };
+      const info=INFO[id];
+      return['add_ai_'+id,()=>(
+        <Screen isDark={isDark} title={info.title} subtitle={info.sub}
+          back={()=>go('need_ai')}
+          next={testResults[id]==='ok'?()=>saveKeysAndGo('need_ai'):null}
+          nextLabel="Save & back to models →"
+          skip={()=>go('need_ai')}>
+          <Steps isDark={isDark} items={info.steps}/>
+          <KeyInput isDark={isDark} placeholder={info.ph} value={keys[id]||''} onChange={v=>setK(id,v)}
+            onTest={()=>testKey(id,keys[id]||'')} testResult={testResults[id]} testing={testing[id]}/>
+          {testResults[id]==='ok'&&(
+            <button onClick={()=>saveKeysAndGo('need_ai')} className="btn btn-primary" style={{width:'100%',padding:'12px',marginTop:12,fontSize:13}}>
+              ✓ Connected — Back to models →
+            </button>
+          )}
+        </Screen>
+      )];
+    }))
     media_intro:()=>(
       <Screen isDark={isDark} title="Media Sources" subtitle="These provide video clips for your videos. All optional — free sources are always used."
         back={()=>go('need_ai')}
