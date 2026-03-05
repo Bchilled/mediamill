@@ -120,8 +120,8 @@ function PlasmaSun({ colors, position, onClick, pulseOffset }) {
     uMid:   { value: new THREE.Color(colors.mid) },
     uOuter: { value: new THREE.Color(colors.outer) },
   }), []);
-  const halo1U = useMemo(() => ({ uColor: { value: new THREE.Color(colors.core) }, uTime: { value: 0 }, uScale: { value: 0.2 } }), []);
-  const halo2U = useMemo(() => ({ uColor: { value: new THREE.Color(colors.mid) },  uTime: { value: 0 }, uScale: { value: 0.1 } }), []);
+  const halo1U = useMemo(() => ({ uColor: { value: new THREE.Color(colors.core) }, uTime: { value: 0 }, uScale: { value: 0.08 } }), []);
+  const halo2U = useMemo(() => ({ uColor: { value: new THREE.Color(colors.mid) },  uTime: { value: 0 }, uScale: { value: 0.04 } }), []);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime() + pulseOffset;
@@ -139,11 +139,11 @@ function PlasmaSun({ colors, position, onClick, pulseOffset }) {
         <shaderMaterial vertexShader={plasmaVert} fragmentShader={plasmaFrag} uniforms={plasmaU} transparent depthWrite={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[1.7, 32, 32]} />
+        <sphereGeometry args={[1.4, 32, 32]} />
         <shaderMaterial vertexShader={haloVert} fragmentShader={haloFrag} uniforms={halo1U} transparent depthWrite={false} side={THREE.BackSide} blending={THREE.AdditiveBlending} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[3.0, 32, 32]} />
+        <sphereGeometry args={[2.2, 32, 32]} />
         <shaderMaterial vertexShader={haloVert} fragmentShader={haloFrag} uniforms={halo2U} transparent depthWrite={false} side={THREE.BackSide} blending={THREE.AdditiveBlending} />
       </mesh>
       <pointLight color={colors.core} intensity={8} distance={80} decay={2} />
