@@ -41,11 +41,7 @@ function Inner(){
         ?'0 0 0 1px rgba(255,255,255,0.07),0 32px 80px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,255,255,0.05)'
         :'0 0 0 1px rgba(0,0,0,0.06),0 24px 60px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.9)',
     }}>
-      <TitleBar
-        onNewChannel={()=>fix(FIX.NEW_CHANNEL)}
-        onSystemSetup={()=>fix('system:setup')}
-        onDoctor={()=>fix(FIX.OPEN_DOCTOR)}
-      />
+      <TitleBar onNewChannel={()=>fix(FIX.NEW_CHANNEL)}/>
       <TabBar/>
 
       {/* Non-blocking hint banners — one line max, always have a Fix button */}

@@ -230,9 +230,10 @@ export default function StatusBar(){
           )}
           {problems.length>0&&(
             <button onClick={e=>{e.stopPropagation();fix(FIX.OPEN_DOCTOR);}}
+              title="Open System Doctor to diagnose and fix issues"
               style={{fontSize:9,fontWeight:700,color:'#FFAA00',background:'rgba(255,170,0,0.08)',
                 padding:'1px 7px',borderRadius:99,border:'1px solid rgba(255,170,0,0.2)',cursor:'pointer'}}>
-              ⚠ {problems.length} issue{problems.length!==1?'s':''}
+              ⚠ {problems.length} issue{problems.length!==1?'s':''} — Fix
             </button>
           )}
           <span style={{fontSize:9,color:muted}}>{expanded?'▼':'▲'}</span>
