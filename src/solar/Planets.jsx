@@ -124,7 +124,12 @@ function PlanetBody({ channel, paletteIndex, orbitAngle, orbitRadius, orbitSpeed
   }, [channel.progress]);
 
   return (
-    <animated.group ref={groupRef} scale={scale} onClick={(e) => { e.stopPropagation(); onClick(channel.id); }}>
+    <animated.group ref={groupRef} scale={scale} onClick={(e) => {
+          e.stopPropagation();
+          const wp = new THREE.Vector3();
+          groupRef.current.getWorldPosition(wp);
+          onClick(channel.id, [wp.x, wp.y, wp.z]);
+        }}>
       {/* Atmosphere */}
       <AtmosphereGlow color={palette.atmosphere} />
 

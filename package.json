@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@react-spring/web": "^10.0.3",
     "axios": "^1.6.7",
     "electron-store": "^8.1.0",
     "fluent-ffmpeg": "^2.1.2",

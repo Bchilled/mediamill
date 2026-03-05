@@ -1,4 +1,4 @@
-import { Suspense, useState, useRef } from 'react';
+import { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
@@ -7,18 +7,17 @@ import Suns from './Suns';
 import Planets from './Planets';
 import SolarCamera from './SolarCamera';
 
-export default function SolarSystem({ suns, channels, onSelectSun, onSelectChannel }) {
-  const [zoomedId, setZoomedId] = useState(null);
-  const zoomedRef = useRef();
+export default function SolarSystem({ suns, channels, onSelectChannel, zoomedChannel }) {
+  const [zoomedPos, setZoomedPos] = useState(null);
 
-  function handleZoom(id) {
-    setZoomedId(prev => prev === id ? null : id);
-    if (onSelectChannel) onSelectChannel(id);
-  }
-
-  function handleBackground() {
-    // Click empty space — zoom back out
-    setZoomedId(null);
+  function handleZoom(id, pos) {
+    if (zoomedChannel === id) {
+      setZoomedPos(null);
+      onSelectChannel(null);
+    } else {
+      setZoomedPos(pos);
+      onSelectChannel(id);
+    }
   }
 
   return (
@@ -26,34 +25,16 @@ export default function SolarSystem({ suns, channels, onSelectSun, onSelectChann
       camera={{ position: [0, 6, 28], fov: 60, near: 0.1, far: 500 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'default' }}
       style={{ position: 'absolute', inset: 0, background: '#03020A' }}
-      onCreated={() => console.log('[Solar] canvas ready')}
-      onPointerMissed={handleBackground}
+      onPointerMissed={() => { setZoomedPos(null); onSelectChannel(null); }}
     >
       <Suspense fallback={null}>
-        {/* The living universe */}
         <Universe />
-
-        {/* AI suns — energy sources */}
-        <Suns suns={suns} onSelect={onSelectSun} />
-
-        {/* Channel planets — orbit the suns */}
-        <Planets channels={channels} zoomedId={zoomedId} onZoom={handleZoom} />
-
-        {/* Camera — drifts, zooms */}
-        <SolarCamera isZoomed={!!zoomedId} zoomedPlanetRef={zoomedRef} />
-
-        {/* Post-processing — makes light feel like light */}
+        <Suns suns={suns} />
+        <Planets channels={channels} zoomedId={zoomedChannel} onZoom={handleZoom} />
+        <SolarCamera zoomedPlanetPos={zoomedPos} />
         <EffectComposer>
-          <Bloom
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.9}
-            intensity={1.4}
-            blendFunction={BlendFunction.ADD}
-          />
-          <ChromaticAberration
-            blendFunction={BlendFunction.NORMAL}
-            offset={[0.0005, 0.0005]}
-          />
+          <Bloom luminanceThreshold={0.15} luminanceSmoothing={0.9} intensity={1.6} blendFunction={BlendFunction.ADD} />
+          <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={[0.0004, 0.0004]} />
         </EffectComposer>
       </Suspense>
     </Canvas>
