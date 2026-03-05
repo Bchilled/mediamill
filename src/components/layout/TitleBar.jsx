@@ -58,7 +58,7 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
         <span style={{fontSize:9,color:muted,marginLeft:2}}>{open?'▲':'▼'}</span>
       </button>
 
-      <button onClick={()=>setActiveView('new-channel')} className="btn btn-primary" style={{fontSize:11,padding:'5px 12px',flexShrink:0}}>
+      <button onClick={onNewChannel||undefined} className="btn btn-primary" style={{fontSize:11,padding:'5px 12px',flexShrink:0}}>
         + New Channel
       </button>
 
@@ -117,7 +117,7 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
   );
 }
 
-export default function TitleBar(){
+export default function TitleBar({onNewChannel,onSystemSetup}){
   const{mode,setMode,theme,setTheme,channels,activeChannel,setActiveChannel,setActiveView,loadChannels}=useApp();
   const isDark=theme==='dark';
   const toggleMode=async()=>{const n=mode==='simple'?'advanced':'simple';setMode(n);try{await window.forge.updateSettings({mode:n});}catch(e){}};
