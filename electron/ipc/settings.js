@@ -58,7 +58,7 @@ module.exports=(ipcMain)=>{
     await getDb();
     const rows=all('SELECT key,value FROM settings');
     return flattenSettings(rows);
-  });
+  };
 
   // Test an API key is valid
   ipcMain.handle('settings:testKey',async(_,service,key)=>{

@@ -99,12 +99,12 @@ export default function Settings(){
       // Sync tray
       if(appPrefs.minimizeToTray)window.forge.enableTray?.();
       else window.forge.disableTray?.();
-      // Sync autostart
       await window.forge.setAutostart?.(appPrefs.runOnStartup);
-      // Sync sound
-      const{setSoundEnabled,setSoundVolume}=await import('../../../utils/sounds.js').catch(()=>({}));
-      setSoundEnabled?.(appPrefs.soundEnabled);
-      setSoundVolume?.(appPrefs.soundVolume);
+      try{
+        const{setSoundEnabled,setSoundVolume}=await import('../../utils/sounds.js');
+        setSoundEnabled(appPrefs.soundEnabled);
+        setSoundVolume(appPrefs.soundVolume);
+      }catch(e){}
       setSaved(true);setTimeout(()=>setSaved(false),2500);
     }catch(e){}
   }
