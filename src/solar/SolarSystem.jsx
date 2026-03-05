@@ -26,7 +26,7 @@ export default function SolarSystem({ suns, channels, onSelectSun, onSelectChann
       camera={{ position: [0, 4, 22], fov: 60, near: 0.1, far: 500 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'default' }}
       style={{ position: 'absolute', inset: 0, background: '#03020A' }}
-      onCreated={({ gl }) => console.log('[Solar] WebGL ready', gl.getParameter(gl.VERSION))}
+      onCreated={() => console.log('[Solar] canvas ready')}
       onPointerMissed={handleBackground}
     >
       <Suspense fallback={null}>
