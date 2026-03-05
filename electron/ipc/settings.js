@@ -1,10 +1,23 @@
-const Store=require('electron-store');
-const store=new Store();
+const{getDb,run,all,get}=require('./db');
 const os=require('os');
-const DEFAULTS={mode:'simple',dailyBudget:5,weeklyBudget:20,monthlyBudget:80,autoApproveGlobal:false,defaultPreset:'long',ffmpegPath:'ffmpeg',outputDir:require('path').join(os.homedir(),'Videos','FORGE'),apiKeys:{claude:'',gemini:'',openai:'',pexels:'',pixabay:'',youtube:''}};
 module.exports=(ipcMain)=>{
-  ipcMain.handle('settings:get',()=>({...DEFAULTS,...store.get('settings',{})}));
-  ipcMain.handle('settings:update',(_,d)=>{store.set('settings',{...store.get('settings',{}),...d});return store.get('settings');});
-  ipcMain.handle('system:stats',async()=>({gpu:{utilization:0},cpu:{utilization:0,cores:os.cpus().length},ram:{used:os.totalmem()-os.freemem(),total:os.totalmem()}}));
-  ipcMain.handle('system:apiUsage',()=>{const{getDb}=require('./db');return getDb().prepare("SELECT * FROM api_usage WHERE date=?").all(new Date().toISOString().split('T')[0]);});
+  ipcMain.handle('settings:get',async()=>{
+    await getDb();
+    const rows=all('SELECT key,value FROM settings');
+    const s={};
+    rows.forEach(r=>{try{s[r.key]=JSON.parse(r.value);}catch(e){s[r.key]=r.value;}});
+    return s;
+  });
+  ipcMain.handle('settings:update',async(_,d)=>{
+    await getDb();
+    for(const[k,v]of Object.entries(d)){
+      run('INSERT OR REPLACE INTO settings(key,value)VALUES(?,?)',[k,JSON.stringify(v)]);
+    }
+    return{ok:true};
+  });
+  ipcMain.handle('settings:systemStats',async()=>({
+    platform:os.platform(),arch:os.arch(),
+    totalMem:os.totalmem(),freeMem:os.freemem(),
+    cpus:os.cpus().length,uptime:os.uptime(),
+  }));
 };

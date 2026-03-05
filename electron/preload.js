@@ -16,8 +16,13 @@ contextBridge.exposeInMainWorld('forge',{
   updateVideo:(id,d)=>ipcRenderer.invoke('videos:update',id,d),
   deleteVideo:(id)=>ipcRenderer.invoke('videos:delete',id),
   approveVideo:(id)=>ipcRenderer.invoke('videos:approve',id),
+  // Pipeline
   startPipeline:(id)=>ipcRenderer.invoke('pipeline:start',id),
   pipelineStatus:(id)=>ipcRenderer.invoke('pipeline:status',id),
+  generateScript:(id)=>ipcRenderer.invoke('pipeline:generateScript',id),
+  gatherAssets:(id)=>ipcRenderer.invoke('pipeline:gatherAssets',id),
+  renderVoice:(id)=>ipcRenderer.invoke('pipeline:renderVoice',id),
+  composeVideo:(id)=>ipcRenderer.invoke('pipeline:compose',id),
   // Ideas
   getIdeas:(channelId,f)=>ipcRenderer.invoke('ideas:getAll',channelId,f),
   createIdea:(d)=>ipcRenderer.invoke('ideas:create',d),
