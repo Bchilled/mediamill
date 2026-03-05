@@ -100,6 +100,8 @@ export default function Settings(){
     saveTimer.current=setTimeout(save,1500);
     return()=>clearTimeout(saveTimer.current);
   },[keys,budget,appPrefs]);
+
+  async function save(){
     try{
       await window.forge.updateSettings({apiKeys:keys,budget,appPrefs});
       // Sync tray
