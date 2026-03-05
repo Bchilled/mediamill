@@ -1,4 +1,4 @@
-import React,{useState,useEffect}from 'react';
+import React,{useState,useEffect,useRef}from 'react';
 import{useApp}from '../../context/AppContext';
 import{useI18n,LANGUAGES}from '../../i18n';
 import{CAPTION_LANGUAGES}from '../../i18n/translations';
@@ -93,7 +93,13 @@ export default function Settings(){
     window.forge.getAutostart?.().then(v=>setAppPrefs(p=>({...p,runOnStartup:v||false}))).catch(()=>{});
   },[]);
 
-  async function save(){
+  // Auto-save 1.5s after any change
+  const saveTimer=useRef();
+  useEffect(()=>{
+    clearTimeout(saveTimer.current);
+    saveTimer.current=setTimeout(save,1500);
+    return()=>clearTimeout(saveTimer.current);
+  },[keys,budget,appPrefs]);
     try{
       await window.forge.updateSettings({apiKeys:keys,budget,appPrefs});
       // Sync tray
