@@ -1,101 +1,266 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
 
-const FIELDS=[
-  {key:'claude',label:'Claude',co:'Anthropic',placeholder:'sk-ant-...',link:'https://console.anthropic.com',desc:'Scripts, SEO, analytics',icon:'🧠'},
-  {key:'gemini',label:'Gemini',co:'Google',placeholder:'AIza...',link:'https://aistudio.google.com/app/apikey',desc:'Ingest, assets, validation',icon:'✨'},
-  {key:'openai',label:'OpenAI',co:'Optional fallback',placeholder:'sk-...',link:'https://platform.openai.com/api-keys',desc:'Backup model',icon:'⚡'},
-  {key:'pexels',label:'Pexels',co:'Stock media',placeholder:'paste key...',link:'https://www.pexels.com/api/',desc:'Free images & video',icon:'📷'},
-  {key:'pixabay',label:'Pixabay',co:'Optional',placeholder:'paste key...',link:'https://pixabay.com/api/docs/',desc:'Additional free assets',icon:'🖼'},
-  {key:'youtube',label:'YouTube Data API',co:'Google Cloud',placeholder:'AIza...',link:'https://console.cloud.google.com',desc:'Upload & analytics — OAuth per channel',icon:'▶️'},
+const SECTIONS=[
+  {id:'ai',icon:'🤖',label:'AI Models',desc:'Who does the work'},
+  {id:'media',icon:'🎬',label:'Media Sources',desc:'Where content comes from'},
+  {id:'voice',icon:'🎙',label:'Voice & Audio',desc:'TTS engines'},
+  {id:'publish',icon:'🚀',label:'Publishing',desc:'YouTube settings'},
+  {id:'budget',icon:'💰',label:'Budget & Limits',desc:'Spending controls'},
+  {id:'storage',icon:'💾',label:'Storage',desc:'File locations'},
+  {id:'advanced',icon:'⚙️',label:'Advanced',desc:'Power user options'},
 ];
 
+const AI_KEYS=[
+  {key:'claude',label:'Claude',badge:'Recommended',bc:'#C8FF00',icon:'🧠',company:'Anthropic',link:'https://console.anthropic.com',ph:'sk-ant-...',what:'Writes scripts, SEO titles, descriptions, tags, and analyzes performance.',when:'Script generation, SEO, analytics.'},
+  {key:'gemini',label:'Gemini',badge:'Recommended',bc:'#00C8FF',icon:'✨',company:'Google',link:'https://aistudio.google.com/app/apikey',ph:'AIza...',what:'Research, fact-checking, asset matching, high-volume cheap tasks.',when:'Content research, asset gathering, validation.'},
+  {key:'openai',label:'OpenAI (GPT-4)',badge:'Optional',bc:'#888',icon:'⚡',company:'OpenAI',link:'https://platform.openai.com/api-keys',ph:'sk-...',what:'Fallback if Claude or Gemini hit rate limits.',when:'Only when primary models are unavailable.'},
+];
+const MEDIA_KEYS=[
+  {key:'pexels',label:'Pexels',icon:'📷',company:'Pexels',link:'https://www.pexels.com/api/',ph:'paste key...',what:'Free stock video clips matched to B-roll cues in your script.',free:true},
+  {key:'pixabay',label:'Pixabay',icon:'🖼',company:'Pixabay',link:'https://pixabay.com/api/docs/',ph:'paste key...',what:'Backup free stock images and video when Pexels doesn\'t have a match.',free:true},
+  {key:'youtube_data',label:'YouTube Data API',icon:'▶️',company:'Google Cloud',link:'https://console.cloud.google.com',ph:'AIza...',what:'Upload videos and pull analytics — views, watch time, revenue estimates.',free:false},
+];
+const VOICE_ENGINES=[
+  {key:'elevenlabs',label:'ElevenLabs',icon:'🎤',link:'https://elevenlabs.io',ph:'paste key...',what:'Most realistic voices. Best quality, costs per character.',cost:'~$0.30/1K chars'},
+  {key:'playht',label:'Play.ht',icon:'🔊',link:'https://play.ht',ph:'paste key...',what:'High quality, large voice library. Good cost/quality balance.',cost:'~$0.10/1K chars'},
+  {key:'coqui',label:'Coqui TTS',icon:'🐸',link:'https://coqui.ai',ph:'local install — no key',what:'Runs on your PC, completely free. Requires Python installed.',cost:'Free'},
+  {key:'windows_tts',label:'Windows TTS',icon:'💻',link:'',ph:'built-in — no key needed',what:'Uses Windows built-in voices. Free, lower quality, good for testing.',cost:'Free'},
+];
+
+function KeyField({ph,value,onChange,isDark,hasToggle=true}){
+  const[show,setShow]=useState(false);
+  return(
+    <div style={{display:'flex',gap:8}}>
+      <input type={show?'text':'password'} value={value||''} onChange={e=>onChange(e.target.value)}
+        placeholder={ph} className={isDark?'input-dark':'input-light'}
+        style={{flex:1,fontFamily:'monospace',fontSize:12}}
+        readOnly={ph.startsWith('built')||ph.startsWith('local')}/>
+      {hasToggle&&!ph.startsWith('built')&&!ph.startsWith('local')&&(
+        <button onClick={()=>setShow(s=>!s)} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{padding:'8px 12px',fontSize:11,flexShrink:0}}>
+          {show?'Hide':'Show'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Card({children,isDark}){
+  return(
+    <div style={{
+      background:isDark?'linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))':'linear-gradient(145deg,#fff,#f8f8ff)',
+      border:'1px solid '+(isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'),
+      borderRadius:14,
+      boxShadow:isDark?'0 4px 20px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.07)':'0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 #fff',
+      overflow:'hidden',marginBottom:12,
+    }}>{children}</div>
+  );
+}
+
 export default function Settings(){
-  const{theme}=useApp();
+  const{theme,mode,setMode}=useApp();
   const isDark=theme==='dark';
+  const[active,setActive]=useState('ai');
   const[keys,setKeys]=useState({});
   const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[saved,setSaved]=useState(false);
-  const[show,setShow]=useState({});
 
   useEffect(()=>{window.forge.getSettings().then(s=>{setKeys(s.apiKeys||{});if(s.budget)setBudget(s.budget);}).catch(()=>{});},[ ]);
 
   async function save(){
-    await window.forge.updateSettings({apiKeys:keys,budget});
-    setSaved(true);setTimeout(()=>setSaved(false),2000);
+    try{await window.forge.updateSettings({apiKeys:keys,budget});setSaved(true);setTimeout(()=>setSaved(false),2500);}catch(e){}
   }
 
-  const bg=isDark?'#08080F':'#F2F2FC';
-  const card=isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.9)';
-  const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
-  const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)':'0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1)';
-  const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)';
   const text=isDark?'#E8E6FF':'#111122';
-  const muted=isDark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.4)';
+  const muted=isDark?'rgba(255,255,255,0.45)':'rgba(0,0,20,0.5)';
+  const sub=isDark?'rgba(255,255,255,0.28)':'rgba(0,0,20,0.35)';
+  const navBg=isDark?'rgba(8,8,18,0.7)':'rgba(232,232,248,0.8)';
+  const navBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
+  const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)';
+  const accent=isDark?'#C8FF00':'#4400CC';
+  const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
+
+  const renderAI=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>AI Models</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16,lineHeight:1.5}}>MediaMill uses multiple AI models and auto-assigns each task to the best model. <strong style={{color:text}}>Claude + Gemini is the recommended combo.</strong> Click "Get Key →" to sign up for free, find the API section, and paste your key below.</p>
+      {AI_KEYS.map(f=>(
+        <Card key={f.key} isDark={isDark}>
+          <div style={{padding:'14px 16px',borderBottom:'1px solid '+rowBorder}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span style={{fontSize:20}}>{f.icon}</span>
+                <div>
+                  <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                    <span style={{fontSize:13,fontWeight:700,color:text}}>{f.label}</span>
+                    <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.bc+'18',color:f.bc,border:'1px solid '+f.bc+'30'}}>{f.badge}</span>
+                  </div>
+                  <div style={{fontSize:10,color:sub}}>{f.company}</div>
+                </div>
+              </div>
+              <a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Get Key ↗</a>
+            </div>
+            <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what} <span style={{color:sub}}>Runs during: {f.when}</span></p>
+          </div>
+          <div style={{padding:'12px 16px'}}><KeyField ph={f.ph} value={keys[f.key]} onChange={v=>setK(f.key,v)} isDark={isDark}/></div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const renderMedia=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Media Sources</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16,lineHeight:1.5}}>Images and video clips for your videos. Wikipedia, Internet Archive, and Wikimedia Commons are always searched for free — no key needed.</p>
+      {MEDIA_KEYS.map(f=>(
+        <Card key={f.key} isDark={isDark}>
+          <div style={{padding:'14px 16px',borderBottom:'1px solid '+rowBorder}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span style={{fontSize:20}}>{f.icon}</span>
+                <div>
+                  <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                    <span style={{fontSize:13,fontWeight:700,color:text}}>{f.label}</span>
+                    <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.free?'rgba(0,230,118,0.12)':'rgba(255,170,0,0.12)',color:f.free?'#00E676':'#FFAA00',border:'1px solid '+(f.free?'rgba(0,230,118,0.2)':'rgba(255,170,0,0.2)')}}>{f.free?'Free API':'Paid'}</span>
+                  </div>
+                  <div style={{fontSize:10,color:sub}}>{f.company}</div>
+                </div>
+              </div>
+              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Get Key ↗</a>}
+            </div>
+            <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what}</p>
+          </div>
+          <div style={{padding:'12px 16px'}}><KeyField ph={f.ph} value={keys[f.key]} onChange={v=>setK(f.key,v)} isDark={isDark}/></div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const renderVoice=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Voice & Audio</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16,lineHeight:1.5}}>AI reads your script aloud. Default engine is set per channel. The AI assigner picks the cheapest available unless you override.</p>
+      {VOICE_ENGINES.map(f=>(
+        <Card key={f.key} isDark={isDark}>
+          <div style={{padding:'14px 16px',borderBottom:'1px solid '+rowBorder}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span style={{fontSize:20}}>{f.icon}</span>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                  <span style={{fontSize:13,fontWeight:700,color:text}}>{f.label}</span>
+                  <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:f.cost==='Free'?'rgba(0,230,118,0.12)':'rgba(0,200,255,0.12)',color:f.cost==='Free'?'#00E676':'#00C8FF',border:'1px solid '+(f.cost==='Free'?'rgba(0,230,118,0.2)':'rgba(0,200,255,0.2)')}}>{f.cost}</span>
+                </div>
+              </div>
+              {f.link&&<a href={f.link} target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none'}}>Sign Up ↗</a>}
+            </div>
+            <p style={{fontSize:11,color:muted,margin:0,lineHeight:1.4}}>{f.what}</p>
+          </div>
+          <div style={{padding:'12px 16px'}}><KeyField ph={f.ph} value={keys[f.key]} onChange={v=>setK(f.key,v)} isDark={isDark}/></div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const renderBudget=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Budget & Limits</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16,lineHeight:1.5}}>AI models charge per use. These limits stop everything automatically when hit. No videos run until you review.</p>
+      <Card isDark={isDark}>
+        {[{key:'daily',label:'Daily Limit',desc:'Resets midnight. Hard stop on all AI tasks.',sug:'$2–$5'},{key:'weekly',label:'Weekly Limit',desc:'Resets Monday. Safety net if daily keeps getting hit.',sug:'$10–$25'},{key:'monthly',label:'Monthly Limit',desc:'Hard ceiling. Nothing runs until next billing cycle.',sug:'$30–$80'}].map((l,i,arr)=>(
+          <div key={l.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px',borderBottom:i<arr.length-1?'1px solid '+rowBorder:'none'}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:600,color:text,marginBottom:2}}>{l.label}</div>
+              <div style={{fontSize:11,color:muted}}>{l.desc}</div>
+              <div style={{fontSize:10,color:accent,opacity:0.6,marginTop:2}}>Suggested: {l.sug}</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <span style={{color:muted}}>$</span>
+              <input type="number" min={0} value={budget[l.key]||0} onChange={e=>setBudget(b=>({...b,[l.key]:parseFloat(e.target.value)||0}))}
+                className={isDark?'input-dark':'input-light'} style={{width:80,fontFamily:'monospace',textAlign:'right'}}/>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+
+  const renderPublish=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Publishing</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16,lineHeight:1.5}}>YouTube OAuth is connected per channel — go to Channels tab to authorize each one. This API key is shared for reading analytics across all channels.</p>
+      <Card isDark={isDark}>
+        <div style={{padding:'16px 18px'}}>
+          <div style={{fontSize:13,fontWeight:600,color:text,marginBottom:4}}>YouTube Data API Key</div>
+          <div style={{fontSize:11,color:muted,marginBottom:12}}>Required to upload videos and pull analytics from YouTube Studio.</div>
+          <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="btn" style={{fontSize:10,padding:'5px 10px',background:'rgba(200,255,0,0.08)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',textDecoration:'none',display:'inline-flex',marginBottom:12}}>Google Cloud Console ↗</a>
+          <KeyField ph="AIza..." value={keys.youtube_data} onChange={v=>setK('youtube_data',v)} isDark={isDark}/>
+        </div>
+      </Card>
+    </div>
+  );
+
+  const renderStorage=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Storage</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:16}}>All files stay on your machine. Nothing is uploaded to any cloud without your permission.</p>
+      <Card isDark={isDark}>
+        {[{l:'Database',p:'%APPDATA%\\MediaMill\\forge.db',d:'Channels, videos, ideas, tasks'},{l:'Scripts',p:'%APPDATA%\\MediaMill\\scripts\\',d:'Generated scripts + SEO data'},{l:'Assets',p:'%APPDATA%\\MediaMill\\assets\\',d:'Downloaded images and clips'},{l:'Voice',p:'%APPDATA%\\MediaMill\\voice\\',d:'Rendered audio files'},{l:'Videos',p:'%APPDATA%\\MediaMill\\output\\',d:'Final rendered videos'}].map((s,i,arr)=>(
+          <div key={s.l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 18px',borderBottom:i<arr.length-1?'1px solid '+rowBorder:'none'}}>
+            <div><div style={{fontSize:12,fontWeight:600,color:text}}>{s.l}</div><div style={{fontSize:10,color:muted}}>{s.d}</div></div>
+            <div style={{fontSize:10,fontFamily:'monospace',color:isDark?'rgba(200,255,0,0.55)':'rgba(68,0,204,0.55)'}}>{s.p}</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+
+  const renderAdvanced=()=>{
+    const isAdv=mode==='advanced';
+    return(
+      <div>
+        <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Advanced</h3>
+        <p style={{fontSize:12,color:muted,marginBottom:16}}>Enables Agent Manager, Task Queue, and Prompt Library tabs. For developers and power users who want full control over the pipeline.</p>
+        <Card isDark={isDark}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 18px'}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:600,color:text,marginBottom:3}}>Advanced Mode</div>
+              <div style={{fontSize:11,color:muted}}>Shows agent config, task queue, and prompt editor in the main nav.</div>
+            </div>
+            <div onClick={async()=>{const n=isAdv?'simple':'advanced';setMode(n);try{await window.forge.updateSettings({mode:n});}catch(e){}}}
+              className="toggle" style={{background:isAdv?'rgba(160,80,255,0.15)':'rgba(255,255,255,0.06)',border:'1px solid '+(isAdv?'rgba(160,80,255,0.3)':'rgba(255,255,255,0.1)')}}>
+              <div className="toggle-thumb" style={{left:isAdv?20:3,background:isAdv?'#B060FF':'rgba(255,255,255,0.3)'}}/>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  };
+
+  const PANELS={ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced};
 
   return(
-    <div className="flex-1 overflow-y-auto p-8" style={{background:bg}}>
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-xl font-black mb-1" style={{color:text}}>Settings</h2>
-        <p className="text-[11px] mb-8" style={{color:muted}}>API keys are stored locally on your machine and never sent to any server.</p>
-
-        {/* API Keys */}
-        <div className="text-[9px] font-bold tracking-[3px] uppercase mb-3" style={{color:muted}}>AI & API Keys</div>
-        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,overflow:'hidden',marginBottom:24}}>
-          {FIELDS.map((f,i)=>(
-            <div key={f.key} style={{borderBottom:i<FIELDS.length-1?'1px solid '+rowBorder:'none',padding:'16px 20px'}}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-lg">{f.icon}</span>
-                  <div>
-                    <div className="font-semibold text-sm" style={{color:text}}>{f.label}</div>
-                    <div className="text-[10px]" style={{color:muted}}>{f.co} · {f.desc}</div>
-                  </div>
-                </div>
-                <a href={f.link} target="_blank" rel="noreferrer"
-                  className="btn" style={{background:'rgba(200,255,0,0.06)',color:'#C8FF00',border:'1px solid rgba(200,255,0,0.2)',padding:'4px 10px',fontSize:10,textDecoration:'none'}}>
-                  Get Key ↗
-                </a>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type={show[f.key]?'text':'password'}
-                  value={keys[f.key]||''}
-                  onChange={e=>setKeys(k=>({...k,[f.key]:e.target.value}))}
-                  placeholder={f.placeholder}
-                  className={isDark?'input-dark':'input-light'}
-                  style={{flex:1,fontFamily:'JetBrains Mono, monospace',fontSize:12}}/>
-                <button onClick={()=>setShow(s=>({...s,[f.key]:!s[f.key]}))}
-                  className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{padding:'8px 12px',fontSize:12}}>
-                  {show[f.key]?'Hide':'Show'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Budget */}
-        <div className="text-[9px] font-bold tracking-[3px] uppercase mb-3" style={{color:muted}}>Spend Limits</div>
-        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'20px',marginBottom:24}}>
-          <div className="grid grid-cols-3 gap-4">
-            {[{label:'Daily',key:'daily'},{label:'Weekly',key:'weekly'},{label:'Monthly',key:'monthly'}].map(b=>(
-              <div key={b.key}>
-                <div className="text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:muted}}>{b.label}</div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-semibold" style={{color:muted}}>$</span>
-                  <input type="number" value={budget[b.key]}
-                    onChange={e=>setBudget(bv=>({...bv,[b.key]:parseFloat(e.target.value)||0}))}
-                    className={isDark?'input-dark':'input-light'} style={{width:'100%',fontFamily:'JetBrains Mono, monospace'}}/>
-                </div>
-              </div>
-            ))}
+    <div style={{flex:1,display:'flex',overflow:'hidden'}}>
+      <div style={{width:190,flexShrink:0,background:navBg,borderRight:'1px solid '+navBorder,overflowY:'auto',padding:'14px 0'}}>
+        <div style={{fontSize:9,fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:sub,padding:'0 14px',marginBottom:8}}>Settings</div>
+        {SECTIONS.map(s=>{
+          const isActive=active===s.id;
+          return(
+            <button key={s.id} onClick={()=>setActive(s.id)} style={{width:'100%',display:'flex',alignItems:'center',gap:10,padding:'9px 14px',background:isActive?(isDark?'rgba(200,255,0,0.07)':'rgba(68,0,204,0.06)'):'transparent',border:'none',borderLeft:'3px solid '+(isActive?accent:'transparent'),cursor:'pointer',textAlign:'left',transition:'all 0.1s'}}
+              onMouseEnter={e=>{if(!isActive)e.currentTarget.style.background=isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)';}}
+              onMouseLeave={e=>{if(!isActive)e.currentTarget.style.background='transparent';}}>
+              <span style={{fontSize:15}}>{s.icon}</span>
+              <div><div style={{fontSize:12,fontWeight:isActive?700:500,color:isActive?accent:text}}>{s.label}</div><div style={{fontSize:9,color:sub}}>{s.desc}</div></div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{flex:1,overflowY:'auto',padding:28}}>
+        <div style={{maxWidth:620}}>
+          {PANELS[active]?.()}
+          <div style={{marginTop:24,display:'flex',alignItems:'center',gap:12}}>
+            <button onClick={save} className="btn btn-primary" style={{padding:'10px 24px'}}>Save Settings</button>
+            {saved&&<span style={{fontSize:12,fontWeight:600,color:'#00E676'}}>✓ Saved</span>}
           </div>
-        </div>
-
-        {/* Save */}
-        <div className="flex items-center gap-3">
-          <button onClick={save} className="btn btn-primary" style={{padding:'10px 24px'}}>Save Settings</button>
-          {saved&&<span className="text-sm font-semibold" style={{color:'#00E676'}}>✓ Saved</span>}
         </div>
       </div>
     </div>
