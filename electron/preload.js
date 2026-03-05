@@ -60,6 +60,14 @@ contextBridge.exposeInMainWorld('forge',{
   importFromUrl:(url)=>ipcRenderer.invoke('media:importFromUrl',url),
   attachCreatorAssets:(videoId,type,files)=>ipcRenderer.invoke('video:attachAssets',videoId,type,files),
   generateSubtitles:(videoId,langCode)=>ipcRenderer.invoke('video:generateSubtitles',videoId,langCode),
+  // Window / Tray / Autostart
+  hideWindow:()=>ipcRenderer.invoke('window:hide'),
+  showWindow:()=>ipcRenderer.invoke('window:show'),
+  isWindowVisible:()=>ipcRenderer.invoke('window:isVisible'),
+  enableTray:()=>ipcRenderer.invoke('tray:enable'),
+  disableTray:()=>ipcRenderer.invoke('tray:disable'),
+  setAutostart:(enable)=>ipcRenderer.invoke('autostart:set',enable),
+  getAutostart:()=>ipcRenderer.invoke('autostart:get'),
   logError:(entry)=>ipcRenderer.invoke('log:error',entry),
   saveErrorLog:(text)=>ipcRenderer.invoke('log:save',text),
 });

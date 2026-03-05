@@ -10,6 +10,7 @@ import{AppProvider,useApp}from './context/AppContext';
 import{fix,FIX}from './utils/fixRouter';
 import{installGlobalErrorHandlers}from './utils/errorTracker';
 import SystemDoctor from './components/views/SystemDoctor';
+import ToastContainer from './components/shared/ToastContainer';
 
 installGlobalErrorHandlers();
 
@@ -119,4 +120,4 @@ function Inner(){
 
 
 
-export default function App(){return(<AppProvider><Inner/></AppProvider>);}
+export default function App(){return(<AppProvider><Inner/><ToastContainer/></AppProvider>);}

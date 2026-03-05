@@ -5,15 +5,17 @@ import{CAPTION_LANGUAGES}from '../../i18n/translations';
 import ErrorLog from '../views/ErrorLog';
 
 const SECTIONS=[
-  {id:'language',icon:'🌐',label:'Language',desc:'App & subtitle languages'},
-  {id:'ai',icon:'🤖',label:'AI Models',desc:'Who does the work'},
-  {id:'media',icon:'🎬',label:'Media Sources',desc:'Where content comes from'},
-  {id:'voice',icon:'🎙',label:'Voice & Audio',desc:'TTS engines'},
-  {id:'publish',icon:'🚀',label:'Publishing',desc:'YouTube settings'},
-  {id:'budget',icon:'💰',label:'Budget & Limits',desc:'Spending controls'},
-  {id:'storage',icon:'💾',label:'Storage',desc:'File locations'},
-  {id:'advanced',icon:'⚙️',label:'Advanced',desc:'Power user options'},
-  {id:'errors',icon:'🐛',label:'Error Log',desc:'Runtime errors & warnings'},
+  {id:'general',  icon:'🏠',label:'General',      desc:'App behavior & startup'},
+  {id:'notifs',   icon:'🔔',label:'Notifications', desc:'Alerts, sounds & log'},
+  {id:'language', icon:'🌐',label:'Language',      desc:'App & subtitle languages'},
+  {id:'ai',       icon:'🤖',label:'AI Models',     desc:'Who does the work'},
+  {id:'media',    icon:'🎬',label:'Media Sources', desc:'Where content comes from'},
+  {id:'voice',    icon:'🎙',label:'Voice & Audio', desc:'TTS engines'},
+  {id:'publish',  icon:'🚀',label:'Publishing',    desc:'YouTube settings'},
+  {id:'budget',   icon:'💰',label:'Budget & Limits',desc:'Spending controls'},
+  {id:'storage',  icon:'💾',label:'Storage',       desc:'File locations'},
+  {id:'advanced', icon:'⚙️',label:'Advanced',      desc:'Power user options'},
+  {id:'errors',   icon:'🐛',label:'Error Log',     desc:'Runtime errors & warnings'},
 ];
 
 const AI_KEYS=[
@@ -66,17 +68,48 @@ export default function Settings(){
   const{theme,mode,setMode,settingsTab,setSettingsTab}=useApp();
   const{t,lang,setLang}=useI18n();
   const isDark=theme==='dark';
-  const[active,setActive]=useState(settingsTab||'language');
+  const[active,setActive]=useState(settingsTab||'general');
   useEffect(()=>{if(settingsTab)setActive(settingsTab);},[settingsTab]);
   const[keys,setKeys]=useState({});
   const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[saved,setSaved]=useState(false);
+  const[appPrefs,setAppPrefs]=useState({
+    minimizeToTray:false,
+    runOnStartup:false,
+    notificationsEnabled:true,
+    notifSound:true,
+    soundEnabled:true,
+    soundVolume:0.4,
+    notifTypes:{success:true,error:true,warning:true,info:true,system:true},
+  });
 
-  useEffect(()=>{window.forge.getSettings().then(s=>{setKeys(s.apiKeys||{});if(s.budget)setBudget(s.budget);}).catch(()=>{});},[ ]);
+  useEffect(()=>{
+    window.forge.getSettings().then(s=>{
+      setKeys(s.apiKeys||{});
+      if(s.budget)setBudget(s.budget);
+      if(s.appPrefs)setAppPrefs(p=>({...p,...s.appPrefs}));
+    }).catch(()=>{});
+    // Sync autostart
+    window.forge.getAutostart?.().then(v=>setAppPrefs(p=>({...p,runOnStartup:v||false}))).catch(()=>{});
+  },[]);
 
   async function save(){
-    try{await window.forge.updateSettings({apiKeys:keys,budget});setSaved(true);setTimeout(()=>setSaved(false),2500);}catch(e){}
+    try{
+      await window.forge.updateSettings({apiKeys:keys,budget,appPrefs});
+      // Sync tray
+      if(appPrefs.minimizeToTray)window.forge.enableTray?.();
+      else window.forge.disableTray?.();
+      // Sync autostart
+      await window.forge.setAutostart?.(appPrefs.runOnStartup);
+      // Sync sound
+      const{setSoundEnabled,setSoundVolume}=await import('../../../utils/sounds.js').catch(()=>({}));
+      setSoundEnabled?.(appPrefs.soundEnabled);
+      setSoundVolume?.(appPrefs.soundVolume);
+      setSaved(true);setTimeout(()=>setSaved(false),2500);
+    }catch(e){}
   }
+
+  function setPref(k,v){setAppPrefs(p=>({...p,[k]:v}));}
 
   const text=isDark?'#E8E6FF':'#111122';
   const muted=isDark?'rgba(255,255,255,0.45)':'rgba(0,0,20,0.5)';
@@ -85,7 +118,175 @@ export default function Settings(){
   const navBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
   const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.06)';
   const accent=isDark?'#C8FF00':'#4400CC';
+  const card=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)';
+  const cardBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
   const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
+
+  // Toggle component
+  function Toggle({value,onChange,label,desc}){
+    return(
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+        padding:'11px 14px',borderRadius:10,background:card,border:'1px solid '+cardBorder,marginBottom:6}}>
+        <div>
+          <div style={{fontSize:12,fontWeight:600,color:text}}>{label}</div>
+          {desc&&<div style={{fontSize:10,color:muted,marginTop:2}}>{desc}</div>}
+        </div>
+        <div onClick={()=>onChange(!value)} style={{
+          width:38,height:22,borderRadius:99,cursor:'pointer',flexShrink:0,
+          background:value?accent:'rgba(255,255,255,0.1)',
+          border:'2px solid '+(value?accent:'rgba(255,255,255,0.15)'),
+          position:'relative',transition:'all 0.2s',
+        }}>
+          <div style={{
+            position:'absolute',top:2,
+            left:value?'calc(100% - 18px)':2,
+            width:14,height:14,borderRadius:'50%',
+            background:value?'#000':'rgba(255,255,255,0.5)',
+            transition:'left 0.2s',
+          }}/>
+        </div>
+      </div>
+    );
+  }
+
+  const renderGeneral=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>General</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:20,lineHeight:1.5}}>App behavior, startup, and window options.</p>
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,marginBottom:8}}>Window</div>
+      <Toggle value={appPrefs.minimizeToTray} onChange={v=>setPref('minimizeToTray',v)}
+        label="Minimize to system tray"
+        desc="Closing or minimizing hides the window to the taskbar tray instead of quitting"/>
+      <Toggle value={appPrefs.runOnStartup} onChange={v=>setPref('runOnStartup',v)}
+        label="Run on system startup"
+        desc="MediaMill starts automatically when you log into Windows"/>
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,margin:'20px 0 8px'}}>Appearance</div>
+      <div style={{display:'flex',gap:8,marginBottom:6}}>
+        {['dark','light'].map(t=>(
+          <button key={t} onClick={async()=>{const{setTheme}=await import('../../context/AppContext').catch(()=>({}));
+            try{await window.forge.updateSettings({theme:t});}catch(e){}
+            // trigger theme via settings update — reload will pick it up
+            window.location.reload();
+          }}
+            style={{flex:1,padding:'10px',borderRadius:10,border:'2px solid '+(theme===t?accent:cardBorder),
+              background:theme===t?accent+'10':card,color:theme===t?accent:muted,
+              cursor:'pointer',fontSize:12,fontWeight:theme===t?700:400,transition:'all 0.15s'}}>
+            {t==='dark'?'🌙 Dark':'☀️ Light'}
+          </button>
+        ))}
+      </div>
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,margin:'20px 0 8px'}}>Operation Mode</div>
+      <div style={{display:'flex',flexDirection:'column',gap:6}}>
+        {[
+          {id:'manual',   icon:'🛠',label:'Manual',      desc:'You control everything — MediaMill is just an organizer and editor'},
+          {id:'assisted', icon:'🤝',label:'Assisted',    desc:'AI suggests everything, you approve every step before it runs'},
+          {id:'semi',     icon:'⚡',label:'Semi-Auto',   desc:'AI runs automatically, prompts you at key decisions (script, thumbnail)'},
+          {id:'auto',     icon:'🚀',label:'Full Auto',   desc:'Lights out — scans, scripts, voices, composes and publishes with zero input'},
+        ].map(m=>{
+          const isSel=mode===m.id||(m.id==='semi'&&mode==='simple')||(m.id==='auto'&&mode==='advanced');
+          return(
+            <div key={m.id} onClick={()=>setMode(m.id)}
+              style={{padding:'11px 14px',borderRadius:10,
+                border:'2px solid '+(mode===m.id?accent+'50':cardBorder),
+                background:mode===m.id?accent+'06':card,
+                cursor:'pointer',display:'flex',gap:12,alignItems:'center',transition:'all 0.12s'}}>
+              <span style={{fontSize:20}}>{m.icon}</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:mode===m.id?accent:text}}>{m.label}</div>
+                <div style={{fontSize:10,color:muted,marginTop:2}}>{m.desc}</div>
+              </div>
+              {mode===m.id&&<span style={{fontSize:10,fontWeight:700,color:accent}}>✓</span>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const renderNotifs=()=>(
+    <div>
+      <h3 style={{fontSize:16,fontWeight:800,color:text,marginBottom:6}}>Notifications</h3>
+      <p style={{fontSize:12,color:muted,marginBottom:20,lineHeight:1.5}}>Control every alert — visual, audio, and what gets logged.</p>
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,marginBottom:8}}>Master Controls</div>
+      <Toggle value={appPrefs.notificationsEnabled} onChange={v=>setPref('notificationsEnabled',v)}
+        label="Enable notifications"
+        desc="Show toast alerts for events. Disabling this silences all popups."/>
+      <Toggle value={appPrefs.notifSound} onChange={v=>setPref('notifSound',v)}
+        label="Notification sounds"
+        desc="Play a sound when notifications appear"/>
+      <Toggle value={appPrefs.soundEnabled} onChange={v=>setPref('soundEnabled',v)}
+        label="UI interaction sounds"
+        desc="Subtle chimes when navigating and clicking"/>
+
+      <div style={{padding:'12px 14px',borderRadius:10,background:card,border:'1px solid '+cardBorder,marginBottom:6}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+          <div style={{fontSize:12,fontWeight:600,color:text}}>Sound volume</div>
+          <span style={{fontSize:11,fontWeight:700,color:accent}}>{Math.round(appPrefs.soundVolume*100)}%</span>
+        </div>
+        <input type="range" min={0} max={1} step={0.05} value={appPrefs.soundVolume}
+          onChange={e=>setPref('soundVolume',parseFloat(e.target.value))}
+          style={{width:'100%',accentColor:accent}}/>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:9,color:sub,marginTop:4}}>
+          <span>Silent</span><span>Full</span>
+        </div>
+      </div>
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,margin:'20px 0 8px'}}>Notify Me When</div>
+      {[
+        {key:'success',icon:'✓',label:'Video completed / uploaded',color:'#00E676'},
+        {key:'error',  icon:'✕',label:'Errors and failures',color:'#EE2244'},
+        {key:'warning',icon:'⚠',label:'Warnings and degraded service',color:'#FFAA00'},
+        {key:'info',   icon:'ℹ',label:'Info and status updates',color:'#00C8FF'},
+        {key:'system', icon:'⚙',label:'System events (scheduler, updates)',color:'#A060FF'},
+      ].map(t=>(
+        <div key={t.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+          padding:'9px 14px',borderRadius:9,background:card,border:'1px solid '+cardBorder,marginBottom:5}}>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <div style={{width:22,height:22,borderRadius:6,background:t.color+'15',border:'1px solid '+t.color+'25',
+              display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,color:t.color,fontWeight:900}}>
+              {t.icon}
+            </div>
+            <span style={{fontSize:12,color:text}}>{t.label}</span>
+          </div>
+          <div onClick={()=>setPref('notifTypes',{...appPrefs.notifTypes,[t.key]:!appPrefs.notifTypes?.[t.key]})}
+            style={{width:34,height:20,borderRadius:99,cursor:'pointer',
+              background:appPrefs.notifTypes?.[t.key]!==false?accent:'rgba(255,255,255,0.1)',
+              border:'2px solid '+(appPrefs.notifTypes?.[t.key]!==false?accent:'rgba(255,255,255,0.15)'),
+              position:'relative',transition:'all 0.2s',flexShrink:0}}>
+            <div style={{position:'absolute',top:2,
+              left:appPrefs.notifTypes?.[t.key]!==false?'calc(100% - 16px)':2,
+              width:12,height:12,borderRadius:'50%',
+              background:appPrefs.notifTypes?.[t.key]!==false?'#000':'rgba(255,255,255,0.5)',
+              transition:'left 0.2s'}}/>
+          </div>
+        </div>
+      ))}
+
+      <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.12em',color:sub,margin:'20px 0 8px'}}>Test</div>
+      <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+        {[
+          {label:'Success',type:'success'},
+          {label:'Warning',type:'warning'},
+          {label:'Error',  type:'error'},
+          {label:'Info',   type:'info'},
+          {label:'System', type:'system'},
+        ].map(b=>(
+          <button key={b.type} onClick={async()=>{
+            const{notify}=await import('../../utils/notifications.js');
+            notify[b.type](`Test ${b.label}`,{message:'This is how it looks. Click to dismiss.'});
+          }}
+            style={{padding:'6px 12px',borderRadius:8,fontSize:11,cursor:'pointer',
+              background:card,border:'1px solid '+cardBorder,color:muted}}>
+            Test {b.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   const renderAI=()=>(
     <div>
@@ -289,7 +490,7 @@ export default function Settings(){
     </div>
   );
 
-  const PANELS={language:renderLanguage,ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced,errors:()=><ErrorLog isDark={isDark}/>};
+  const PANELS={general:renderGeneral,notifs:renderNotifs,language:renderLanguage,ai:renderAI,media:renderMedia,voice:renderVoice,publish:renderPublish,budget:renderBudget,storage:renderStorage,advanced:renderAdvanced,errors:()=><ErrorLog isDark={isDark}/>};
 
   return(
     <div style={{flex:1,display:'flex',overflow:'hidden'}}>

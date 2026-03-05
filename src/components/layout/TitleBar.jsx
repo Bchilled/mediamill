@@ -117,6 +117,40 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
   );
 }
 
+function NotifBell({isDark}){
+  const[notifs,setNotifs]=useState([]);
+  const[open,setOpen]=useState(false);
+  const ref=useRef();
+  useEffect(()=>subscribeNotifications(setNotifs),[]);
+  useEffect(()=>{
+    function handler(e){if(ref.current&&!ref.current.contains(e.target))setOpen(false);}
+    document.addEventListener('mousedown',handler);
+    return()=>document.removeEventListener('mousedown',handler);
+  },[]);
+  const unread=notifs.filter(n=>!n.read).length;
+  const muted=isDark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.5)';
+  const accent=isDark?'#C8FF00':'#4400CC';
+  return(
+    <div ref={ref} style={{position:'relative',flexShrink:0}} WebkitAppRegion="no-drag">
+      <button onClick={()=>setOpen(o=>!o)}
+        style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
+          cursor:'pointer',color:muted,padding:'4px 8px',fontSize:12,position:'relative',transition:'all 0.1s'}}
+        onMouseEnter={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
+        onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+        🔔
+        {unread>0&&(
+          <span style={{position:'absolute',top:-4,right:-4,minWidth:16,height:16,borderRadius:99,
+            background:'#EE2244',fontSize:8,fontWeight:900,color:'#fff',
+            display:'flex',alignItems:'center',justifyContent:'center',padding:'0 3px'}}>
+            {unread>9?'9+':unread}
+          </span>
+        )}
+      </button>
+      {open&&<NotificationPanel isDark={isDark} onClose={()=>setOpen(false)}/>}
+    </div>
+  );
+}
+
 export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
   const{mode,setMode,theme,setTheme,channels,activeChannel,setActiveChannel,setActiveView,loadChannels}=useApp();
   const isDark=theme==='dark';
@@ -147,6 +181,7 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
           style={{background:'transparent',border:'none',cursor:'pointer',color:txt,padding:'4px 8px',fontSize:15,borderRadius:7,transition:'all 0.1s'}}
           onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'}
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}>⚙</button>
+        <NotifBell isDark={isDark}/>
         <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" WebkitAppRegion="no-drag"
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
