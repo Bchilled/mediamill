@@ -16,7 +16,8 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
   const PC={short:'#C8FF00',mid:'#00C8FF',long:'#FF8040'};
 
   return(
-    <div ref={ref} style={{position:'relative',WebkitAppRegion:'no-drag'}}>
+    <div ref={ref} style={{position:'relative',WebkitAppRegion:'no-drag',display:'flex',gap:6}}>
+      {/* Channel selector */}
       <button onClick={()=>setOpen(o=>!o)} style={{
         display:'flex',alignItems:'center',gap:8,padding:'5px 12px',
         background:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',
@@ -37,6 +38,12 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
         )}
         <span style={{fontSize:9,color:muted,marginLeft:2}}>{open?'▲':'▼'}</span>
       </button>
+
+      {/* + New Channel button — always visible */}
+      <button onClick={()=>setActiveView('new-channel')} className="btn btn-primary" style={{fontSize:11,padding:'5px 12px',flexShrink:0}}>
+        + New Channel
+      </button>
+
       {open&&(
         <div style={{position:'absolute',top:'calc(100% + 6px)',left:0,minWidth:220,zIndex:1000,background:menuBg,border:'1px solid '+menuBorder,borderRadius:12,boxShadow:'0 16px 48px rgba(0,0,0,0.4)',overflow:'hidden'}}>
           {channels.length===0&&<div style={{padding:'12px 16px',fontSize:12,color:muted}}>No channels yet</div>}
@@ -53,14 +60,6 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
               {activeChannel?.id===ch.id&&<span style={{fontSize:10,color:accentColor}}>✓</span>}
             </div>
           ))}
-          <div style={{borderTop:'1px solid '+menuBorder,padding:8}}>
-            <button onClick={()=>{setActiveView('channels');setOpen(false);}}
-              style={{width:'100%',padding:'8px 10px',fontSize:11,fontWeight:600,background:'transparent',border:'1px dashed '+(isDark?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.15)'),borderRadius:8,color:muted,cursor:'pointer',transition:'all 0.12s'}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=accentColor;e.currentTarget.style.color=accentColor;}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=isDark?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.15)';e.currentTarget.style.color=muted;}}>
-              + New Channel
-            </button>
-          </div>
         </div>
       )}
     </div>
@@ -83,7 +82,7 @@ export default function TitleBar(){
       borderRadius:'14px 14px 0 0',
       userSelect:'none',WebkitAppRegion:'drag',
     }}>
-      <span style={{fontWeight:900,fontSize:13,letterSpacing:'0.16em',textTransform:'uppercase',color:isDark?'#C8FF00':'#4400CC',textShadow:isDark?'0 0 24px rgba(200,255,0,0.4)':'none',marginRight:4,flexShrink:0}}>
+      <span style={{fontWeight:900,fontSize:13,letterSpacing:'0.16em',textTransform:'uppercase',color:isDark?'#C8FF00':'#4400CC',textShadow:isDark?'0 0 24px rgba(200,255,0,0.4)':'none',marginRight:6,flexShrink:0}}>
         MediaMill
       </span>
 
@@ -93,13 +92,10 @@ export default function TitleBar(){
       <div style={{flex:1}}/>
 
       <div style={{display:'flex',alignItems:'center',gap:6,WebkitAppRegion:'no-drag'}}>
-        {/* Settings icon button */}
         <button onClick={()=>setActiveView('settings')} title="Settings"
           style={{background:'transparent',border:'none',cursor:'pointer',color:txt,padding:'4px 8px',fontSize:15,borderRadius:7,transition:'all 0.1s'}}
-          onMouseEnter={e=>{e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';e.currentTarget.style.color=isDark?'#fff':'#000';}}
-          onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color=txt;}}>
-          ⚙
-        </button>
+          onMouseEnter={e=>{e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';}}
+          onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>⚙</button>
         <button onClick={toggleTheme} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:11,padding:'5px 10px'}}>
           {isDark?'☀︎ Light':'◑ Dark'}
         </button>

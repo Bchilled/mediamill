@@ -1,7 +1,7 @@
 import React,{createContext,useContext,useState,useEffect}from 'react';
 const Ctx=createContext(null);
 export function AppProvider({children}){
-  const[activeView,setActiveView]=useState('dashboard');
+  const[activeView,setActiveView]=useState('pipeline:ideas');
   const[activeChannel,setActiveChannel]=useState(null);
   const[channels,setChannels]=useState([]);
   const[mode,setMode]=useState('simple');
