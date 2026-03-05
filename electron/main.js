@@ -6,8 +6,10 @@ let win;
 function createWindow(){
   win=new BrowserWindow({
     width:1440,height:900,minWidth:1100,minHeight:700,
-    frame:false,transparent:true,backgroundColor:'#00000000',
-    roundedCorners:true,titleBarStyle:'hidden',
+    frame:false,
+    backgroundColor:'#0D0D1A',
+    roundedCorners:true,
+    titleBarStyle:'hidden',
     webPreferences:{
       preload:path.join(__dirname,'preload.js'),
       nodeIntegration:false,contextIsolation:true,
@@ -15,10 +17,9 @@ function createWindow(){
     show:false,
   });
   isDev?win.loadURL('http://localhost:5173'):win.loadFile(path.join(__dirname,'../dist/index.html'));
-  win.once('ready-to-show',()=>{
-    win.show();
-    if(!isDev)checkForUpdates();
-  });
+  // Show on ready-to-show, with 3s fallback in case it never fires
+  win.once('ready-to-show',()=>{win.show();if(!isDev)checkForUpdates();});
+  setTimeout(()=>{if(win&&!win.isVisible())win.show();},3000);
   if(isDev)win.webContents.openDevTools({mode:'detach'});
 }
 
