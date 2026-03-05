@@ -133,7 +133,7 @@ function NotifBell({isDark}){
   const muted=isDark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.5)';
   const accent=isDark?'#C8FF00':'#4400CC';
   return(
-    <div ref={ref} style={{position:'relative',flexShrink:0}} style={{webkitAppRegion:"no-drag"}}>
+    <div ref={ref} style={{position:'relative',flexShrink:0,WebkitAppRegion:'no-drag'}}>
       <button onClick={()=>setOpen(o=>!o)}
         style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
           cursor:'pointer',color:muted,padding:'4px 8px',fontSize:12,position:'relative',transition:'all 0.1s'}}
@@ -185,14 +185,14 @@ export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
           onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'}
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}>⚙</button>
         <NotifBell isDark={isDark}/>
-        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" style={{webkitAppRegion:"no-drag"}}
+        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues"
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
           onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>
           🔬
         </button>
-        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" style={{webkitAppRegion:"no-drag"}}
+        <button onClick={onSystemSetup} title="System Setup — API keys and configuration"
           style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
             cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
