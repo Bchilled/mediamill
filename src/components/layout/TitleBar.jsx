@@ -117,7 +117,7 @@ function ChannelDropdown({isDark,channels,activeChannel,setActiveChannel,setActi
   );
 }
 
-export default function TitleBar({onNewChannel,onSystemSetup}){
+export default function TitleBar({onNewChannel,onSystemSetup,onDoctor}){
   const{mode,setMode,theme,setTheme,channels,activeChannel,setActiveChannel,setActiveView,loadChannels}=useApp();
   const isDark=theme==='dark';
   const toggleMode=async()=>{const n=mode==='simple'?'advanced':'simple';setMode(n);try{await window.forge.updateSettings({mode:n});}catch(e){}};
@@ -147,6 +147,20 @@ export default function TitleBar({onNewChannel,onSystemSetup}){
           style={{background:'transparent',border:'none',cursor:'pointer',color:txt,padding:'4px 8px',fontSize:15,borderRadius:7,transition:'all 0.1s'}}
           onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)'}
           onMouseLeave={e=>e.currentTarget.style.background='transparent'}>⚙</button>
+        <button onClick={onDoctor} title="System Doctor — diagnose and fix issues" WebkitAppRegion="no-drag"
+          style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
+            cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
+          onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
+          onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>
+          🔬
+        </button>
+        <button onClick={onSystemSetup} title="System Setup — API keys and configuration" WebkitAppRegion="no-drag"
+          style={{background:'transparent',border:'1px solid rgba(255,255,255,0.08)',borderRadius:7,
+            cursor:'pointer',color:txt,padding:'4px 8px',fontSize:12,flexShrink:0,transition:'all 0.1s'}}
+          onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,255,255,0.08)';}}
+          onMouseLeave={e=>{e.currentTarget.style.background='transparent';}}>
+          ⚙️
+        </button>
         <button onClick={toggleTheme} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:11,padding:'5px 10px'}}>
           {isDark?'☀︎ Light':'◑ Dark'}
         </button>

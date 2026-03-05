@@ -63,10 +63,11 @@ function Card({children,isDark}){
 }
 
 export default function Settings(){
-  const{theme,mode,setMode}=useApp();
+  const{theme,mode,setMode,settingsTab,setSettingsTab}=useApp();
   const{t,lang,setLang}=useI18n();
   const isDark=theme==='dark';
-  const[active,setActive]=useState('language');
+  const[active,setActive]=useState(settingsTab||'language');
+  useEffect(()=>{if(settingsTab)setActive(settingsTab);},[settingsTab]);
   const[keys,setKeys]=useState({});
   const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[saved,setSaved]=useState(false);

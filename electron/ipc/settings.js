@@ -127,19 +127,31 @@ module.exports=(ipcMain)=>{
     rows.forEach(r=>{try{keys[r.key]=JSON.parse(r.value);}catch(e){keys[r.key]=r.value;}});
     const apiKeys=keys.apiKeys||{};
 
-    // AI keys
+    // AI keys — each gets an action code the frontend can route directly
     s.claude=apiKeys.claude?'ok':'none';
     s.gemini=apiKeys.gemini?'ok':'none';
-    if(!apiKeys.claude&&!apiKeys.gemini){s.claude='error';s.claude_fix='No AI model connected — go to Settings → AI Models';}
+    s.openai=apiKeys.openai?'ok':'none';
+    if(apiKeys.claude)s.claude='ok';
+    if(apiKeys.gemini)s.gemini='ok';
+    if(!apiKeys.claude&&!apiKeys.gemini&&!apiKeys.openai&&!apiKeys.grok&&!apiKeys.mistral){
+      s.claude='error';
+      s.claude_msg='No AI model connected';
+      s.claude_fix='Connect at least one AI model to generate content';
+      s.claude_action='settings:ai';
+    }
 
     // Media
     s.pexels=apiKeys.pexels?'ok':'none';
+    if(!apiKeys.pexels){s.pexels_msg='Optional — adds stock video clips';s.pexels_action='settings:media:pexels';}
     s.pixabay=apiKeys.pixabay?'ok':'none';
+    if(!apiKeys.pixabay){s.pixabay_msg='Optional — adds stock images';s.pixabay_action='settings:media:pixabay';}
     s.elevenlabs=apiKeys.elevenlabs?'ok':'none';
+    if(!apiKeys.elevenlabs){s.elevenlabs_msg='Optional — premium AI voices';s.elevenlabs_action='settings:media:elevenlabs';}
 
     // YouTube
     const ytTokens=Object.keys(keys).some(k=>k.startsWith('yt_tokens.'));
     s.youtube=ytTokens?'ok':'none';
+    if(!ytTokens){s.youtube_msg='Not connected — videos save locally only';s.youtube_action='settings:youtube';}
 
     // FFmpeg
     const{execSync}=require('child_process');

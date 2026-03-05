@@ -1,69 +1,57 @@
-// ErrorTracker — captures all runtime errors, IPC errors, and React errors
-// Stores to disk via IPC, accessible in Settings → Error Log
+import{suggestFix}from './fixRouter';
 
-let errors = [];
-let listeners = [];
+let errors=[];
+let listeners=[];
 
-function notify() {
-  listeners.forEach(fn => fn([...errors]));
-}
+function notify(){listeners.forEach(fn=>fn([...errors]));}
 
-export function subscribeErrors(fn) {
+export function subscribeErrors(fn){
   listeners.push(fn);
   fn([...errors]);
-  return () => { listeners = listeners.filter(l => l !== fn); };
+  return()=>{listeners=listeners.filter(l=>l!==fn);};
 }
 
-export function logError(source, message, detail = '', stack = '') {
-  const entry = {
-    id: Date.now() + Math.random(),
-    timestamp: new Date().toISOString(),
+export function logError(source,message,detail='',stack=''){
+  const suggestion=suggestFix(source,message);
+  const entry={
+    id:Date.now()+Math.random(),
+    timestamp:new Date().toISOString(),
     source,
-    message: String(message),
-    detail: String(detail || ''),
-    stack: String(stack || ''),
-    resolved: false,
+    message:String(message),
+    detail:String(detail||''),
+    stack:String(stack||''),
+    resolved:false,
+    fixAction:suggestion.action,
+    fixLabel:suggestion.label,
   };
-  errors = [entry, ...errors].slice(0, 200); // keep last 200
+  errors=[entry,...errors].slice(0,200);
   notify();
-  // Persist to main process
-  try { window.forge.logError(entry); } catch (e) {}
-  return entry.id;
+  try{window.forge.logError(entry);}catch(e){}
 }
 
-export function resolveError(id) {
-  errors = errors.map(e => e.id === id ? { ...e, resolved: true } : e);
-  notify();
-}
-
-export function clearErrors() {
-  errors = [];
+export function resolveError(id){
+  errors=errors.map(e=>e.id===id?{...e,resolved:true}:e);
   notify();
 }
 
-export function getErrors() { return [...errors]; }
+export function clearErrors(){
+  errors=[];
+  notify();
+}
 
-// ── Global error hooks ────────────────────────────────────────────────
-
-export function installGlobalErrorHandlers() {
-  // Unhandled JS errors
-  window.onerror = (msg, src, line, col, err) => {
-    logError('window', msg, `${src}:${line}:${col}`, err?.stack || '');
+export function installGlobalErrorHandlers(){
+  window.onerror=(msg,src,line,col,err)=>{
+    logError('window',msg,`${src}:${line}`,err?.stack||'');
+    return false;
   };
-
-  // Unhandled promise rejections
-  window.onunhandledrejection = (e) => {
-    const err = e.reason;
-    logError('promise', err?.message || String(err), '', err?.stack || '');
+  window.onunhandledrejection=e=>{
+    logError('promise',e.reason?.message||String(e.reason),'Unhandled promise rejection',e.reason?.stack||'');
   };
-
-  // Patch console.error to capture errors
-  const origError = console.error.bind(console);
-  console.error = (...args) => {
+  const origError=console.error.bind(console);
+  console.error=(...args)=>{
     origError(...args);
-    const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
-    if (!msg.includes('[ErrorTracker]')) { // avoid recursion
-      logError('console', msg.slice(0, 200));
-    }
+    const msg=args.map(a=>typeof a==='object'?JSON.stringify(a):String(a)).join(' ');
+    if(msg.includes('[vite]')||msg.includes('ResizeObserver'))return;
+    logError('console',msg.slice(0,200));
   };
 }
