@@ -1,30 +1,25 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
 
-const STATUS_COLOR={pending:'#888899',processing:'#00C8FF',review:'#FF8040',approved:'#00E676',published:'#C8FF00',failed:'#EE2244'};
-const STAGE_ICON={ingest:'📥',script:'📄',assets:'🖼',voice:'🎙',compose:'🎞',review:'👁',publish:'🚀'};
-
 export default function Dashboard(){
-  const{activeChannel,channels,setActiveView,setActiveChannel,theme}=useApp();
+  const{activeChannel,channels,setActiveView,setActiveChannel,theme,loadChannels}=useApp();
   const[stats,setStats]=useState(null);
   const[recentVideos,setRecentVideos]=useState([]);
   const[recentIdeas,setRecentIdeas]=useState([]);
   const[ytStatus,setYtStatus]=useState(null);
+  const[scanning,setScanning]=useState(false);
+  const[togglingAuto,setTogglingAuto]=useState(false);
   const isDark=theme==='dark';
 
   const text=isDark?'#E8E6FF':'#111122';
   const muted=isDark?'rgba(255,255,255,0.4)':'rgba(0,0,20,0.45)';
-  const sub=isDark?'rgba(255,255,255,0.25)':'rgba(0,0,20,0.3)';
-  const card=isDark?'linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))':'linear-gradient(145deg,#fff,#f8f8ff)';
-  const cardBorder=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
-  const cardShadow=isDark?'0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.07)':'0 2px 16px rgba(0,0,0,0.07),inset 0 1px 0 #fff';
+  const sub=isDark?'rgba(255,255,255,0.22)':'rgba(0,0,20,0.28)';
   const accent=isDark?'#C8FF00':'#4400CC';
-  const rowBorder=isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)';
+  const card=isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.85)';
+  const cardBorder=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';
+  const cardShadow=isDark?'0 2px 12px rgba(0,0,0,0.3)':'0 2px 12px rgba(0,0,0,0.06)';
 
-  useEffect(()=>{
-    if(!activeChannel)return;
-    loadData();
-  },[activeChannel?.id]);
+  useEffect(()=>{if(activeChannel)loadData();},[activeChannel?.id]);
 
   async function loadData(){
     try{
@@ -33,54 +28,93 @@ export default function Dashboard(){
         window.forge.getIdeas(activeChannel.id,{}),
         window.forge.youtubeStatus(activeChannel.id).catch(()=>({connected:false})),
       ]);
-      // Compute stats
-      const s={total:videos.length,pending:0,processing:0,review:0,published:0,failed:0,ideas:ideas.length};
+      const s={ideas:ideas.length,pending:0,processing:0,review:0,published:0,failed:0};
       videos.forEach(v=>{if(s[v.status]!==undefined)s[v.status]++;});
-      setStats(s);
-      setRecentVideos(videos.slice(0,5));
+      setStats(s);setRecentVideos(videos.slice(0,5));
       setRecentIdeas(ideas.filter(i=>i.status==='idea').slice(0,5));
       setYtStatus(yt);
     }catch(e){console.error(e);}
   }
 
+  async function toggleAutoApprove(){
+    setTogglingAuto(true);
+    try{
+      await window.forge.updateChannel(activeChannel.id,{auto_approve:activeChannel.auto_approve?0:1});
+      await loadChannels();
+    }catch(e){console.error(e);}
+    setTogglingAuto(false);
+  }
+
+  async function scanIdeas(){
+    setScanning(true);
+    try{await window.forge.scanIdeas(activeChannel.id);}catch(e){console.error(e);}
+    await loadData();setScanning(false);
+  }
+
   if(!activeChannel)return(
-    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
+    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,padding:24}}>
       <div style={{fontSize:48}}>📡</div>
-      <div style={{fontSize:18,fontWeight:700,color:text}}>No channel selected</div>
-      <div style={{fontSize:13,color:muted,marginBottom:8}}>Create a channel to get started</div>
+      <div style={{fontSize:18,fontWeight:800,color:text}}>No channel selected</div>
+      <div style={{fontSize:13,color:muted}}>Create a channel to get started</div>
       <button onClick={()=>setActiveView('new-channel')} className="btn btn-primary" style={{padding:'10px 24px'}}>Create Channel</button>
-      {channels.length>0&&(
-        <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'center',marginTop:8}}>
+      {channels?.length>0&&(
+        <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'center',marginTop:4}}>
           {channels.map(ch=>(
-            <button key={ch.id} onClick={()=>setActiveChannel(ch)} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:12}}>
-              {ch.name}
-            </button>
+            <button key={ch.id} onClick={()=>setActiveChannel(ch)} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:12}}>{ch.name}</button>
           ))}
         </div>
       )}
     </div>
   );
 
+  const isEmpty=!stats||Object.values({pending:stats.pending,processing:stats.processing,review:stats.review,published:stats.published,failed:stats.failed}).every(v=>v===0);
+  const ytUrl=activeChannel.youtube_id?`https://youtube.com/channel/${activeChannel.youtube_id}`:null;
+
+  const statCards=[
+    {label:'Ideas',  value:stats?.ideas||0,  icon:'💡',view:'pipeline:ideas', color:'#888'},
+    {label:'Pending',value:stats?.pending||0, icon:'⏳',view:'pipeline:ideas', color:'#888899'},
+    {label:'In Progress',value:stats?.processing||0,icon:'⚡',view:null,color:'#00C8FF'},
+    {label:'Review', value:stats?.review||0,  icon:'👁',view:'pipeline:review',color:'#FF8040'},
+    {label:'Published',value:stats?.published||0,icon:'🚀',view:'pipeline:publish',color:'#C8FF00'},
+    {label:'Failed', value:stats?.failed||0,  icon:'✗',view:null,             color:'#EE2244'},
+  ];
+
   return(
-    <div style={{flex:1,overflowY:'auto',padding:28}}>
-      <div style={{maxWidth:1100,margin:'0 auto'}}>
+    <div style={{flex:1,overflowY:'auto',padding:'20px 24px'}}>
+      <div style={{maxWidth:1000,margin:'0 auto'}}>
 
         {/* Header */}
-        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:28}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,flexWrap:'wrap',gap:12}}>
           <div>
             <h1 style={{fontSize:22,fontWeight:900,color:text,marginBottom:4}}>{activeChannel.name}</h1>
-            <div style={{fontSize:12,color:muted,display:'flex',gap:12,alignItems:'center'}}>
-              <span style={{textTransform:'capitalize'}}>{activeChannel.preset}-form</span>
-              <span>·</span>
-              <span>{activeChannel.auto_approve?'⚡ Auto-approve on':'◎ Manual review'}</span>
-              <span>·</span>
-              <span style={{color:ytStatus?.connected?'#00E676':'#EE2244'}}>{ytStatus?.connected?'✓ YouTube connected':'✗ YouTube not connected'}</span>
+            <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
+              <span style={{fontSize:11,color:muted,textTransform:'capitalize'}}>{activeChannel.preset}-Form</span>
+              <span style={{color:sub}}>·</span>
+              <span style={{fontSize:11,color:activeChannel.auto_approve?'#00E676':muted}}>
+                {activeChannel.auto_approve?'⚡ Full Auto':'👁 Manual review'}
+              </span>
+              <span style={{color:sub}}>·</span>
+              {ytStatus?.connected?(
+                ytUrl?<a href="#" onClick={e=>{e.preventDefault();window.forge.openExternal(ytUrl);}} style={{fontSize:11,color:accent,textDecoration:'none'}}>youtube.com/channel ↗</a>
+                :<span style={{fontSize:11,color:'#00E676'}}>✓ YouTube connected</span>
+              ):(
+                <span style={{fontSize:11,color:'#EE2244'}}>✗ YouTube not connected</span>
+              )}
             </div>
-            {(activeChannel.topic||activeChannel.style_prompt)&&(
-              <div style={{fontSize:11,color:sub,marginTop:6,fontStyle:'italic',maxWidth:500}}>"{activeChannel.topic||activeChannel.style_prompt}"</div>
-            )}
+            {activeChannel.topic&&<div style={{fontSize:11,color:sub,marginTop:4,fontStyle:'italic'}}>"{activeChannel.topic}"</div>}
           </div>
-          <div style={{display:'flex',gap:8}}>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            {/* Full Auto toggle */}
+            <button onClick={toggleAutoApprove} disabled={togglingAuto}
+              style={{display:'flex',alignItems:'center',gap:7,padding:'7px 13px',borderRadius:9,cursor:'pointer',fontSize:11,fontWeight:600,
+                background:activeChannel.auto_approve?'rgba(0,230,118,0.1)':'rgba(255,255,255,0.05)',
+                border:'1px solid '+(activeChannel.auto_approve?'rgba(0,230,118,0.3)':'rgba(255,255,255,0.12)'),
+                color:activeChannel.auto_approve?'#00E676':muted}}>
+              <div style={{width:28,height:16,borderRadius:99,background:activeChannel.auto_approve?'rgba(0,230,118,0.3)':'rgba(255,255,255,0.1)',position:'relative',transition:'all 0.2s'}}>
+                <div style={{width:12,height:12,borderRadius:'50%',background:activeChannel.auto_approve?'#00E676':'rgba(255,255,255,0.4)',position:'absolute',top:2,left:activeChannel.auto_approve?14:2,transition:'all 0.2s'}}/>
+              </div>
+              Full Auto
+            </button>
             {!ytStatus?.connected&&(
               <button onClick={async()=>{try{await window.forge.youtubeConnect(activeChannel.id);loadData();}catch(e){alert(e.message);}}}
                 className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:11}}>
@@ -94,107 +128,93 @@ export default function Dashboard(){
           </div>
         </div>
 
-        {/* Stat cards */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:12,marginBottom:24}}>
-          {[
-            {label:'Ideas',val:stats?.ideas||0,color:'#888',icon:'💡',view:'pipeline:ideas'},
-            {label:'Pending',val:stats?.pending||0,color:STATUS_COLOR.pending,icon:'⏳',view:'pipeline:scripts'},
-            {label:'Processing',val:stats?.processing||0,color:STATUS_COLOR.processing,icon:'⚡',view:'pipeline:scripts'},
-            {label:'Review',val:stats?.review||0,color:STATUS_COLOR.review,icon:'👁',view:'pipeline:review'},
-            {label:'Published',val:stats?.published||0,color:STATUS_COLOR.published,icon:'🚀',view:'pipeline:publish'},
-            {label:'Failed',val:stats?.failed||0,color:STATUS_COLOR.failed,icon:'✗',view:'pipeline:scripts'},
-          ].map(s=>(
-            <div key={s.label} onClick={()=>setActiveView(s.view)}
-              style={{background:card,border:'1px solid '+(s.val>0&&s.label!=='Published'?s.color+'30':cardBorder),borderRadius:14,boxShadow:cardShadow,padding:'16px',cursor:'pointer',transition:'all 0.15s',textAlign:'center',borderTop:'3px solid '+(s.val>0?s.color:'transparent')}}
-              onMouseEnter={e=>e.currentTarget.style.transform='translateY(-2px)'}
-              onMouseLeave={e=>e.currentTarget.style.transform='none'}>
-              <div style={{fontSize:22,marginBottom:6}}>{s.icon}</div>
-              <div style={{fontSize:24,fontWeight:900,color:s.val>0?s.color:muted,lineHeight:1}}>{s.val}</div>
-              <div style={{fontSize:10,color:sub,marginTop:4,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.08em'}}>{s.label}</div>
+        {/* Empty state — no stats, show getting started */}
+        {isEmpty?(
+          <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,padding:'32px 24px',textAlign:'center',marginBottom:20,boxShadow:cardShadow}}>
+            <div style={{fontSize:48,marginBottom:12}}>🚀</div>
+            <div style={{fontSize:16,fontWeight:800,color:text,marginBottom:8}}>Ready to make your first video</div>
+            <div style={{fontSize:13,color:muted,marginBottom:20,lineHeight:1.6}}>
+              MediaMill finds Canadian stories, writes AI scripts, gathers footage, records narration, and composes the video — automatically.
             </div>
-          ))}
-        </div>
-
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginBottom:20}}>
-
-          {/* Recent videos */}
-          <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,overflow:'hidden'}}>
-            <div style={{padding:'14px 18px',borderBottom:'1px solid '+rowBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <div style={{fontSize:12,fontWeight:700,color:text}}>Recent Videos</div>
-              <button onClick={()=>setActiveView('pipeline:scripts')} style={{fontSize:10,color:accent,background:'transparent',border:'none',cursor:'pointer'}}>View all →</button>
+            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+              <button onClick={scanIdeas} disabled={scanning} className="btn btn-primary" style={{fontSize:13,padding:'10px 22px',opacity:scanning?0.6:1}}>
+                {scanning?'⟳ Scanning…':'🔍 Scan for Ideas'}
+              </button>
+              <button onClick={()=>setActiveView('pipeline:ideas')} className={isDark?'btn btn-ghost':'btn btn-ghost-light'} style={{fontSize:13,padding:'10px 20px'}}>
+                Browse Ideas →
+              </button>
             </div>
-            {recentVideos.length===0?(
-              <div style={{padding:'32px 18px',textAlign:'center',color:muted,fontSize:12}}>No videos yet.<br/>Approve an idea to start.</div>
-            ):(
-              recentVideos.map((v,i)=>{
-                const sc=STATUS_COLOR[v.status]||'#888';
-                return(
-                  <div key={v.id} onClick={()=>setActiveView('pipeline:scripts')}
-                    style={{display:'flex',alignItems:'center',gap:12,padding:'11px 18px',borderBottom:i<recentVideos.length-1?'1px solid '+rowBorder:'none',cursor:'pointer',transition:'background 0.1s'}}
-                    onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span style={{fontSize:16,flexShrink:0}}>{STAGE_ICON[v.stage]||'📹'}</span>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:12,fontWeight:600,color:text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{v.title}</div>
-                      <div style={{fontSize:10,color:muted,textTransform:'capitalize'}}>{v.stage} · {new Date(v.created_at).toLocaleDateString()}</div>
-                    </div>
-                    <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:99,background:sc+'18',color:sc,border:'1px solid '+sc+'30',flexShrink:0,textTransform:'uppercase'}}>{v.status}</span>
+            <div style={{marginTop:20,display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
+              {[
+                {n:'1',t:'Scan for ideas', desc:'AI finds current Canadian stories'},
+                {n:'2',t:'Approve one',    desc:'Click ✓ on an idea you like'},
+                {n:'3',t:'Run pipeline',   desc:'AI scripts, voices, composes video'},
+                {n:'4',t:'Review & publish',desc:'Watch it, then send to YouTube'},
+              ].map(s=>(
+                <div key={s.n} style={{textAlign:'center',maxWidth:110,padding:'12px 10px',background:isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.025)',borderRadius:12,border:'1px solid '+cardBorder}}>
+                  <div style={{width:24,height:24,borderRadius:'50%',background:accent+'15',border:'1px solid '+accent+'30',
+                    display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:800,color:accent,margin:'0 auto 6px'}}>
+                    {s.n}
                   </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* Pending ideas */}
-          <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,overflow:'hidden'}}>
-            <div style={{padding:'14px 18px',borderBottom:'1px solid '+rowBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <div style={{fontSize:12,fontWeight:700,color:text}}>Pending Ideas</div>
-              <button onClick={()=>setActiveView('pipeline:ideas')} style={{fontSize:10,color:accent,background:'transparent',border:'none',cursor:'pointer'}}>View all →</button>
-            </div>
-            {recentIdeas.length===0?(
-              <div style={{padding:'32px 18px',textAlign:'center',color:muted,fontSize:12}}>No pending ideas.<br/>
-                <button onClick={async()=>{try{await window.forge.scanIdeas(activeChannel.id);setTimeout(loadData,3000);}catch(e){}}} style={{color:accent,background:'transparent',border:'none',cursor:'pointer',fontSize:12,marginTop:8}}>
-                  🤖 Scan for ideas
-                </button>
-              </div>
-            ):(
-              recentIdeas.map((idea,i)=>(
-                <div key={idea.id}
-                  style={{display:'flex',alignItems:'center',gap:12,padding:'11px 18px',borderBottom:i<recentIdeas.length-1?'1px solid '+rowBorder:'none',cursor:'pointer',transition:'background 0.1s'}}
-                  onMouseEnter={e=>e.currentTarget.style.background=isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                  <span style={{fontSize:16,flexShrink:0}}>{idea.origin==='manual'?'✏️':idea.origin?.includes('reddit')?'💬':'📰'}</span>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:12,fontWeight:600,color:text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{idea.title}</div>
-                    <div style={{fontSize:10,color:muted}}>{idea.origin?.replace('ai_','')}</div>
-                  </div>
-                  <button onClick={async(e)=>{e.stopPropagation();try{await window.forge.approveIdea(idea.id);loadData();}catch(e){alert(e.message);}}}
-                    className="btn btn-primary" style={{fontSize:10,padding:'3px 10px',flexShrink:0}}>
-                    ✓ Approve
-                  </button>
+                  <div style={{fontSize:11,fontWeight:700,color:text,marginBottom:3}}>{s.t}</div>
+                  <div style={{fontSize:10,color:muted,lineHeight:1.3}}>{s.desc}</div>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        ):(
+          <>
+            {/* Stats grid */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:10,marginBottom:20}}>
+              {statCards.map(s=>(
+                <div key={s.label} onClick={s.view?()=>setActiveView(s.view):undefined}
+                  style={{background:card,border:'1px solid '+cardBorder,borderRadius:14,padding:'16px 12px',textAlign:'center',
+                    cursor:s.view?'pointer':'default',boxShadow:cardShadow,transition:'transform 0.1s',
+                    opacity:s.value===0?0.45:1}}
+                  onMouseEnter={e=>{if(s.view)e.currentTarget.style.transform='translateY(-2px)';}}
+                  onMouseLeave={e=>e.currentTarget.style.transform='translateY(0)'}>
+                  <div style={{fontSize:20,marginBottom:6}}>{s.icon}</div>
+                  <div style={{fontSize:22,fontWeight:900,color:s.value>0?s.color:muted}}>{s.value}</div>
+                  <div style={{fontSize:10,fontWeight:600,color:muted,textTransform:'uppercase',letterSpacing:'0.08em',marginTop:2}}>{s.label}</div>
+                </div>
+              ))}
+            </div>
 
-        {/* Pipeline health */}
-        <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'18px 20px'}}>
-          <div style={{fontSize:12,fontWeight:700,color:text,marginBottom:14}}>Pipeline at a Glance</div>
-          <div style={{display:'flex',gap:0,alignItems:'center'}}>
-            {['ingest','script','assets','voice','compose','review','publish'].map((stage,i,arr)=>{
-              return(
-                <React.Fragment key={stage}>
-                  <div style={{flex:1,textAlign:'center',padding:'8px 4px',cursor:'pointer'}} onClick={()=>setActiveView('pipeline:'+stage)}>
-                    <div style={{fontSize:20,marginBottom:4}}>{STAGE_ICON[stage]}</div>
-                    <div style={{fontSize:9,color:muted,textTransform:'capitalize',fontWeight:600}}>{stage}</div>
+            {/* Recent Videos + Pending Ideas */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
+              {[
+                {title:'Recent Videos',items:recentVideos,empty:'No videos yet — approve an idea to start',view:'pipeline:review',
+                  render:v=><div key={v.id} style={{display:'flex',gap:10,padding:'8px 0',borderBottom:'1px solid '+cardBorder,alignItems:'center'}}>
+                    <span style={{fontSize:16}}>{v.status==='published'?'🚀':v.status==='review'?'👁':'⚡'}</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{v.title||'Untitled'}</div>
+                      <div style={{fontSize:10,color:muted,textTransform:'capitalize'}}>{v.status}</div>
+                    </div>
+                  </div>},
+                {title:'Pending Ideas',items:recentIdeas,empty:'No ideas yet',view:'pipeline:ideas',
+                  render:i=><div key={i.id} style={{display:'flex',gap:10,padding:'8px 0',borderBottom:'1px solid '+cardBorder,alignItems:'center'}}>
+                    <span style={{fontSize:16}}>💡</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{i.title}</div>
+                      <div style={{fontSize:10,color:muted}}>{i.source||'AI generated'}</div>
+                    </div>
+                    <button onClick={async()=>{try{await window.forge.approveIdea(i.id);loadData();}catch(e){}}}
+                      style={{fontSize:10,padding:'3px 9px',borderRadius:7,background:accent+'12',color:accent,border:'1px solid '+accent+'30',cursor:'pointer',flexShrink:0}}>✓</button>
+                  </div>},
+              ].map(panel=>(
+                <div key={panel.title} style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,padding:'16px',boxShadow:cardShadow}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
+                    <div style={{fontSize:13,fontWeight:800,color:text}}>{panel.title}</div>
+                    <button onClick={()=>setActiveView(panel.view)} style={{fontSize:11,color:accent,background:'none',border:'none',cursor:'pointer'}}>View all →</button>
                   </div>
-                  {i<arr.length-1&&<div style={{color:sub,fontSize:12,flexShrink:0}}>›</div>}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
+                  {panel.items.length>0?panel.items.map(panel.render):(
+                    <div style={{textAlign:'center',padding:'16px 0',color:muted,fontSize:12}}>{panel.empty}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

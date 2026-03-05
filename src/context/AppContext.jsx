@@ -11,7 +11,20 @@ export function AppProvider({children}){
   useEffect(()=>{loadChannels();loadSettings();},[]);
 
   async function loadChannels(){
-    try{const d=await window.forge.getChannels();setChannels(d||[]);if(d?.length>0)setActiveChannel(c=>c||d[0]);}
+    try{
+      const d=await window.forge.getChannels();
+      setChannels(d||[]);
+      if(d?.length>0){
+        // If active channel was deleted, switch to first available
+        setActiveChannel(c=>{
+          if(!c)return d[0];
+          const still=d.find(ch=>ch.id===c.id);
+          return still||d[0];
+        });
+      } else {
+        setActiveChannel(null);
+      }
+    }}
     catch(e){setChannels([]);}
   }
   async function loadSettings(){

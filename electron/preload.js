@@ -55,4 +55,5 @@ contextBridge.exposeInMainWorld('forge',{
   getSettings:()=>ipcRenderer.invoke('settings:get'),
   updateSettings:(d)=>ipcRenderer.invoke('settings:update',d),
   getSystemStats:()=>ipcRenderer.invoke('settings:systemStats'),
+  getSystemStatus:()=>ipcRenderer.invoke('system:status'),
 });

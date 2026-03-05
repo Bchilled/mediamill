@@ -117,3 +117,49 @@ module.exports=(ipcMain)=>{
   });
 
 };
+
+  ipcMain.handle('system:status',async()=>{
+    const{getDb,get,all}=require('./db');
+    await getDb();
+    const s={};
+    const rows=all('SELECT key,value FROM settings');
+    const keys={};
+    rows.forEach(r=>{try{keys[r.key]=JSON.parse(r.value);}catch(e){keys[r.key]=r.value;}});
+    const apiKeys=keys.apiKeys||{};
+
+    // AI keys
+    s.claude=apiKeys.claude?'ok':'none';
+    s.gemini=apiKeys.gemini?'ok':'none';
+    if(!apiKeys.claude&&!apiKeys.gemini){s.claude='error';s.claude_fix='No AI model connected — go to Settings → AI Models';}
+
+    // Media
+    s.pexels=apiKeys.pexels?'ok':'none';
+    s.pixabay=apiKeys.pixabay?'ok':'none';
+    s.elevenlabs=apiKeys.elevenlabs?'ok':'none';
+
+    // YouTube
+    const ytTokens=Object.keys(keys).some(k=>k.startsWith('yt_tokens.'));
+    s.youtube=ytTokens?'ok':'none';
+
+    // FFmpeg
+    const{execSync}=require('child_process');
+    const{app}=require('electron');
+    const path=require('path');
+    const fs=require('fs');
+    try{
+      const ffmpegPath=path.join(app.getPath('userData'),'ffmpeg.exe');
+      const candidates=[ffmpegPath,'ffmpeg'];
+      let found=false;
+      for(const c of candidates){try{execSync(`"${c}" -version`,{stdio:'ignore',timeout:3000});found=true;break;}catch(e){}}
+      s.ffmpeg=found?'ok':'warn';
+      if(!found){s.ffmpeg_msg='Not found in PATH';s.ffmpeg_fix='FFmpeg will be bundled with the final release build';}
+    }catch(e){s.ffmpeg='warn';}
+
+    // DB
+    try{
+      const count=get('SELECT count(*) as n FROM channels');
+      s.db='ok';
+    }catch(e){s.db='error';s.db_msg=e.message;}
+
+    return s;
+  });

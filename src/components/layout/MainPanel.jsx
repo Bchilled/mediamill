@@ -95,7 +95,6 @@ export default function MainPanel(){
   const View=VIEWS[activeView]||Dashboard;
   return(
     <div style={{display:'flex',flexDirection:'column',overflow:'hidden',flex:1,background:isDark?'rgba(8,8,16,0.5)':'rgba(244,244,255,0.6)'}}>
-      <TabBar/>
       <div style={{flex:1,display:'flex',overflow:'hidden'}}>
         <View/>
       </div>

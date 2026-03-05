@@ -1,6 +1,8 @@
 import React,{useState,useEffect}from 'react';
 import TitleBar from './components/layout/TitleBar';
 import MainPanel from './components/layout/MainPanel';
+import TabBar from './components/layout/TabBar';
+import StatusBar from './components/layout/StatusBar';
 import FirstRun from './components/views/FirstRun';
 import{AppProvider,useApp}from './context/AppContext';
 
@@ -29,7 +31,9 @@ function Inner(){
       boxShadow:isDark?'0 32px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.06)':'0 32px 80px rgba(0,0,0,0.2),0 0 0 1px rgba(0,0,0,0.08)',
     }}>
       <TitleBar/>
+      <TabBar/>
       <MainPanel/>
+      <StatusBar/>
     </div>
   );
 }
