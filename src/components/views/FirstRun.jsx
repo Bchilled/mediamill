@@ -1,5 +1,6 @@
 import React,{useState}from 'react';
 import{useApp}from '../../context/AppContext';
+import LogoPicker from './LogoPicker';
 
 // ─── Step definitions ───────────────────────────────────────────────
 const STEPS=[
@@ -101,6 +102,7 @@ export default function FirstRun({onComplete}){
   const[keys,setKeys]=useState({claude:'',gemini:'',openai:'',pexels:'',pixabay:'',youtube_client_id:'',youtube_client_secret:'',elevenlabs:''});
   const[budget,setBudget]=useState({daily:5,weekly:20,monthly:80});
   const[channel,setChannel]=useState({name:'',topic:'',preset:'long',voice_engine:'auto',auto_approve:false});
+  const[selectedLogo,setSelectedLogo]=useState(null);
 
   const setK=(k,v)=>setKeys(ks=>({...ks,[k]:v}));
   const setCh=(k,v)=>setChannel(c=>({...c,[k]:v}));
@@ -149,6 +151,7 @@ export default function FirstRun({onComplete}){
           preset:channel.preset,
           voice_engine:channel.voice_engine,
           auto_approve:channel.auto_approve,
+          logo_path:selectedLogo?.path||null,
         });
         await loadChannels();
         next();
@@ -451,6 +454,9 @@ export default function FirstRun({onComplete}){
               <option value="coqui">Coqui TTS (free, local)</option>
             </select>
           </div>
+
+          {/* Logo picker */}
+          <LogoPicker channelName={channel.name} topic={channel.topic} isDark={isDark} selected={selectedLogo} onSelect={setSelectedLogo}/>
 
           {/* Auto-approve */}
           <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:12,padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>

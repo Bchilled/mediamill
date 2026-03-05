@@ -1,5 +1,6 @@
 import React,{useState}from 'react';
 import{useApp}from '../../context/AppContext';
+import LogoPicker from './LogoPicker';
 
 const PRESETS={
   short:{label:'Shorts',icon:'⚡',desc:'Under 60 seconds',color:'#C8FF00'},
@@ -21,6 +22,7 @@ export default function NewChannel(){
   const[form,setForm]=useState({name:'',preset:'long',topic:'',style_prompt:'',voice_engine:'elevenlabs',auto_approve:false});
   const[saving,setSaving]=useState(false);
   const[error,setError]=useState('');
+  const[selectedLogo,setSelectedLogo]=useState(null);
   const set=(k,v)=>setForm(f=>({...f,[k]:v}));
   const isDark=theme==='dark';
 
@@ -37,7 +39,7 @@ export default function NewChannel(){
     if(!form.topic.trim()){setError('Channel topic is required — the AI needs this to find relevant content');return;}
     setSaving(true);
     try{
-      await window.forge.createChannel({...form,style_prompt:form.style_prompt||form.topic});
+      await window.forge.createChannel({...form,style_prompt:form.style_prompt||form.topic,logo_path:selectedLogo?.path||null});
       await loadChannels();
       setActiveView('dashboard');
     }catch(e){setError(e.message);}
@@ -130,6 +132,11 @@ export default function NewChannel(){
               className={isDark?'input-dark':'input-light'} style={{resize:'none'}}/>
           </div>
         )}
+
+        {/* Logo */}
+        <div style={{marginBottom:24}}>
+          <LogoPicker channelName={form.name} topic={form.topic||form.style_prompt} isDark={isDark} selected={selectedLogo} onSelect={setSelectedLogo}/>
+        </div>
 
         {/* Auto-approve */}
         <div style={{background:card,border:'1px solid '+cardBorder,borderRadius:16,boxShadow:cardShadow,padding:'16px 24px',marginBottom:24}}>
