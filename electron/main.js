@@ -7,7 +7,8 @@ function createWindow(){
   win=new BrowserWindow({
     width:1440,height:900,minWidth:1100,minHeight:700,
     frame:false,
-    backgroundColor:'#0D0D1A',
+    transparent:true,
+    backgroundColor:'#00000000',
     roundedCorners:true,
     titleBarStyle:'hidden',
     webPreferences:{
