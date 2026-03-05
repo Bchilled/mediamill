@@ -1,5 +1,8 @@
 const{getDb,run,all,get}=require('./db');
 const os=require('os');
+const fs=require('fs');
+const path=require('path');
+const{app,dialog}=require('electron');
 
 function flattenSettings(rows){
   const s={apiKeys:{}};
