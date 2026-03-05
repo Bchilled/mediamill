@@ -15,7 +15,6 @@ export function AppProvider({children}){
       const d=await window.forge.getChannels();
       setChannels(d||[]);
       if(d?.length>0){
-        // If active channel was deleted, switch to first available
         setActiveChannel(c=>{
           if(!c)return d[0];
           const still=d.find(ch=>ch.id===c.id);
@@ -24,8 +23,7 @@ export function AppProvider({children}){
       } else {
         setActiveChannel(null);
       }
-    }}
-    catch(e){setChannels([]);}
+    }catch(e){setChannels([]);}
   }
   async function loadSettings(){
     try{const s=await window.forge.getSettings();setSettings(s);setMode(s.mode||'simple');setTheme(s.theme||'dark');}

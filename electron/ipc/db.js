@@ -99,14 +99,9 @@ function all(sql,params=[]){
 }
 function get(sql,params=[]){return all(sql,params)[0]||null;}
 
-// Works as require('./ipc/db')(ipcMain) from main.js AND const{getDb}=require('./ipc/db')
-const dbModule=function(ipcMain){};
-dbModule.getDb=getDb;dbModule.saveDb=saveDb;dbModule.run=run;dbModule.all=all;dbModule.get=get;
-module.exports=dbModule;
-
+const dbModule=function(ipcMain){
   ipcMain.handle('video:attachAssets',async(_,videoId,assetType,files)=>{
-    const db=await getDb();
-    // Store creator assets in video record under creator_assets JSON column
+    await getDb();
     const existing=get('SELECT creator_assets FROM videos WHERE id=?',[videoId]);
     let ca={};
     try{ca=JSON.parse(existing?.creator_assets||'{}');}catch(e){}
@@ -115,21 +110,16 @@ module.exports=dbModule;
     return{ok:true};
   });
 
-  // Generate subtitles for a video in a given language
   ipcMain.handle('video:generateSubtitles',async(_,videoId,langCode)=>{
-    // Get video and its script
+    await getDb();
     const video=get('SELECT * FROM videos WHERE id=?',[videoId]);
     if(!video)throw new Error('Video not found');
-
     const settings_row=get("SELECT value FROM settings WHERE key='apiKeys'");
     const apiKeys=settings_row?JSON.parse(settings_row.value):{};
-
     let script='';
     try{const s=JSON.parse(video.script||'{}');script=(s.script||[]).map(seg=>seg.text||'').join('\n\n');}catch(e){}
-
     if(!script)throw new Error('No script found — generate a script first');
 
-    // Use AI to translate if not English
     const https=require('https');
     function aiPost(body){
       return new Promise((res,rej)=>{
@@ -142,9 +132,14 @@ module.exports=dbModule;
       });
     }
 
+    function pad(n){return String(n).padStart(2,'0');}
+    function formatSRT(seconds){
+      const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60),s=Math.floor(seconds%60),ms=Math.floor((seconds%1)*1000);
+      return`${pad(h)}:${pad(m)}:${pad(s)},${String(ms).padStart(3,'0')}`;
+    }
+
     let srtContent='';
     if(langCode==='en'||langCode==='en-CA'){
-      // Convert script to basic SRT
       const segments=(JSON.parse(video.script||'{}')).script||[];
       let idx=1,time=0;
       srtContent=segments.map(seg=>{
@@ -158,19 +153,16 @@ module.exports=dbModule;
       const resp=await aiPost({model:'claude-haiku-4-5-20251001',max_tokens:4096,messages:[{role:'user',content:prompt}]});
       srtContent=resp.content?.[0]?.text||'';
     } else {
-      throw new Error('Claude API key required for translation. Add it in Settings → AI Models.');
+      throw new Error('Claude API key required for translation.');
     }
 
-    // Save SRT to video record
     const existing=JSON.parse(video.creator_assets||'{}');
     existing.subtitles=existing.subtitles||{};
     existing.subtitles[langCode]={content:srtContent,generated_at:new Date().toISOString()};
     run('UPDATE videos SET creator_assets=? WHERE id=?',[JSON.stringify(existing),videoId]);
     return{ok:true,langCode,lines:srtContent.split('\n').length};
   });
+};
 
-  function formatSRT(seconds){
-    const h=Math.floor(seconds/3600),m=Math.floor((seconds%3600)/60),s=Math.floor(seconds%60),ms=Math.floor((seconds%1)*1000);
-    return`${pad(h)}:${pad(m)}:${pad(s)},${String(ms).padStart(3,'0')}`;
-  }
-  function pad(n){return String(n).padStart(2,'0');}
+dbModule.getDb=getDb;dbModule.saveDb=saveDb;dbModule.run=run;dbModule.all=all;dbModule.get=get;
+module.exports=dbModule;

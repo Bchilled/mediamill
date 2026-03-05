@@ -1,6 +1,7 @@
 import React,{useState,useEffect}from 'react';
 import{useApp}from '../../context/AppContext';
 import{useI18n,LANGUAGES}from '../../i18n';
+import{CAPTION_LANGUAGES}from '../../i18n/translations';
 
 const SECTIONS=[
   {id:'language',icon:'🌐',label:'Language',desc:'App & subtitle languages'},
@@ -274,14 +275,11 @@ export default function Settings(){
         <div style={{fontSize:11,fontWeight:700,color:muted,textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:6}}>Default Subtitle Languages for New Videos</div>
         <div style={{fontSize:12,color:muted,marginBottom:12,lineHeight:1.5}}>These languages will be pre-selected in the Subtitles panel for every new video. You can always change them per-video.</div>
         <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-          {['en','en-CA','fr','fr-CA','es','de','zh-Hans','ja','ko','pt-BR','hi','ar'].map(code=>{
-            const{CAPTION_LANGUAGES}=require('../../i18n/translations') || {};
-            return(
+          {['en','en-CA','fr','fr-CA','es','de','zh-Hans','ja','ko','pt-BR','hi','ar'].map(code=>(
               <div key={code} style={{padding:'5px 12px',borderRadius:8,background:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:'1px solid '+(isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'),fontSize:11,color:muted}}>
-                {code}
+                {CAPTION_LANGUAGES.find(l=>l.code===code)?.name||code}
               </div>
-            );
-          })}
+            ))}
         </div>
         <div style={{fontSize:11,color:muted,marginTop:10}}>Subtitle generation uses AI translation — requires Claude or Gemini key.</div>
       </div>

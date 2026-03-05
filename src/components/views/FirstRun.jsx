@@ -341,7 +341,7 @@ export default function FirstRun({onComplete}){
         <Steps isDark={isDark} items={[
           {text:'Open Anthropic Console',url:'https://console.anthropic.com'},
           {text:'Left sidebar →',highlight:'API Keys'},
-          {text:'Click',highlight:'+ Create Key','— name it MediaMill'},
+          {text:'Click — name it MediaMill',highlight:'+ Create Key'},
           'Copy the key (starts with sk-ant-)',
           'Paste below and click Test',
         ]}/>
